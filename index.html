@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="./style.css" />
+    <title>ci-timeline-visualizer proto</title>
+</head>
+<body>
+    <div id="ci-timeline-visualizer">
+    </div>
+
+</body>
+<script type="module">
+
+    import {getJobLog, cleanupJobLog, parseJobLog, calculateTimes, visualize} from "./ci-timeline-visualizer.js"
+
+    let jobLog = getJobLog();
+    console.log(jobLog);
+    let jobLogClean = cleanupJobLog(jobLog);
+    console.log(jobLogClean);
+    let sectionTags = parseJobLog(jobLogClean);
+    console.log(sectionTags)
+    let times = calculateTimes(sectionTags);
+    console.log(times);
+
+    let testTimes1 = [
+        ["a", 2],
+        ["b", 28],
+        ["c", 4],
+        ["d", 66]
+    ];
+
+    let testTimes2 = [
+        ["a", 5],
+        ["b", 5],
+        ["c", 5],
+        ["d", 85]
+    ];
+
+    visualize(document.getElementById("ci-timeline-visualizer"), times);
+
+</script>
+</html>

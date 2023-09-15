@@ -1,0 +1,24 @@
+#ci-timeline-visualizer {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    background-color: black;
+    width: 1000px;
+    height: 100px;
+}
+
+#ci-timeline-visualizer > .section {
+    background-color: lightblue;
+    border-style: solid;
+    border-width: 2px;
+    height: 100%;
+}
+
+#ci-timeline-visualizer .tooltip {
+    background-color: black;
+    position: absolute;
+    height: 50px;
+    width: 50px;
+    top: 100%;
+    left: 50%;
+}
