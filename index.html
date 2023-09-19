@@ -11,34 +11,5 @@
     </div>
 
 </body>
-<script type="module">
-
-    import {getJobLog, removeAnsi, parseJobLog, convertToSections, visualize} from "./ci-timeline-visualizer.js"
-
-    let jobLog = getJobLog();
-    console.log(jobLog);
-    let jobLogClean = removeAnsi(jobLog);
-    console.log(jobLogClean);
-    let sectionTags = parseJobLog(jobLogClean);
-    console.log(sectionTags)
-    let times = convertToSections(sectionTags);
-    console.log(times);
-
-    let testTimes1 = [
-        ["a", 2],
-        ["b", 28],
-        ["c", 4],
-        ["d", 66]
-    ];
-
-    let testTimes2 = [
-        ["a", 5],
-        ["b", 5],
-        ["c", 5],
-        ["d", 85]
-    ];
-
-    visualize(document.getElementById("ci-timeline-visualizer"), times);
-
-</script>
+<script type="module" src="ci-timeline-visualizer.js"></script>
 </html>

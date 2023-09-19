@@ -13,8 +13,6 @@ Modules only work via HTTP, so you should use a local web server, such as:
 
 If you try to run it locally (`file://`), you will be met with a CORS policy error.
 
-Currently the module loads a job log from the `joblogoutput.txt` file for demonstrational purposes.
-
 ## GitLab's job log syntax
 
 GitLab uses ANSI escape sequences to format and hide certain text.
