@@ -5,11 +5,13 @@ class SectionTag {
     tagType = SectionTag.START;
     unixTimestamp = 0;
     sectionName = "";
+    lineNumber = 0;
 
-    constructor(tagType, unixTimestamp, sectionName) {
+    constructor(tagType, unixTimestamp, sectionName, lineNumber) {
         this.tagType = tagType;
         this.unixTimestamp = unixTimestamp;
         this.sectionName = sectionName;
+        this.lineNumber = lineNumber;
     }
 }
 
@@ -37,12 +39,11 @@ function getJobLogFromAPI(personal_access_token, project_id, job_id) {
     return apiCall.responseText;
 }
 
-function cleanupJobLog(rawJobLog) {
+function removeAnsi(rawJobLog) {
     let ansiRegex = /\u001b\[[\d;]*[mK]/g; // does not match all ANSI codes!
     let ansiless = rawJobLog.replace(ansiRegex, "");
 
-    let lineSeparated = ansiless.replaceAll('\r', '\n');
-    return lineSeparated;
+    return ansiless;
 }
 
 function parseJobLog(cleanJobLog) {
@@ -50,16 +51,20 @@ function parseJobLog(cleanJobLog) {
     let lines = cleanJobLog.split('\n');
     let sectionRegex = /^section_(start|end):\d+:/i;
     let stringSections = [];
-    for(const line of lines) {
-        if(sectionRegex.test(line)) {
-            stringSections.push(line);
+    for(const i in lines) {
+        if(sectionRegex.test(lines[i])) {
+            let separateSections = lines[i].split('\r');
+            for(const section of separateSections) {
+                if(sectionRegex.test(section))
+                    stringSections.push([section, i]);
+            }
         }
     }
 
     // Put them in SectionTags
     let sectionTags = [];
     for(const section of stringSections) {
-        let splitSection = section.split(':');
+        let splitSection = section[0].split(':');
 
         let newTagType;
         switch(splitSection[0]) {
@@ -75,7 +80,7 @@ function parseJobLog(cleanJobLog) {
 
         let newSectionName = splitSection[2];
 
-        sectionTags.push(new SectionTag(newTagType, newUnixTimestamp, newSectionName));
+        sectionTags.push(new SectionTag(newTagType, newUnixTimestamp, newSectionName, section[1]));
     }
     return sectionTags;
 }
@@ -176,4 +181,4 @@ let testTimes2 = [
     ["d", 85]
 ];
 
-export {getJobLog, getJobLogFromAPI, cleanupJobLog, parseJobLog, calculateTimes, visualize}
+export {getJobLog, getJobLogFromAPI, removeAnsi, parseJobLog, calculateTimes, visualize}

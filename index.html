@@ -13,11 +13,11 @@
 </body>
 <script type="module">
 
-    import {getJobLog, cleanupJobLog, parseJobLog, calculateTimes, visualize} from "./ci-timeline-visualizer.js"
+    import {getJobLog, removeAnsi, parseJobLog, calculateTimes, visualize} from "./ci-timeline-visualizer.js"
 
     let jobLog = getJobLog();
     console.log(jobLog);
-    let jobLogClean = cleanupJobLog(jobLog);
+    let jobLogClean = removeAnsi(jobLog);
     console.log(jobLogClean);
     let sectionTags = parseJobLog(jobLogClean);
     console.log(sectionTags)
