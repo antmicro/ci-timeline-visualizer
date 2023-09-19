@@ -14,6 +14,6 @@ export class State {
     sections = []
 
     constructor() {
-        sections = [];
+        this.sections = [];
     }
 }

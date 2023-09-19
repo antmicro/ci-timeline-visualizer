@@ -1,4 +1,5 @@
 import { SectionTag, Section } from "./classes.js";
+import { State } from "./global-state.js";
 
 export function removeAnsi(rawJobLog) {
     let ansiRegex = /\u001b\[[\d;]*[mK]/g; // does not match all ANSI codes!
@@ -46,21 +47,26 @@ export function parseJobLog(cleanJobLog) {
     return sectionTags;
 }
 
-export function convertToSections(sectionTags) {
-    let sections = [];
-    // For now we'll trust that a section ends before another one starts
-    let tagOpenedFlag = false;
-    let startTag;
-    for(const tag of sectionTags) {
-        if(!tagOpenedFlag) {
-            startTag = tag;
-            tagOpenedFlag = true;
+export function updateSections(newTags) {
+    let sections = State.instance().sections;
+    let lastSection = sections[sections.length-1];
+
+    let isOpen = false;
+    if(lastSection != null)
+        isOpen = lastSection.isOpen;
+    // If there is a tag after the opening tag, it should be a closing tag.
+    // This might not be the case if subsections were to be implemented.
+    for(const tag of newTags) {
+        if(isOpen) {
+            lastSection.closeSection(tag);
+            isOpen = false;
         } else {
-            sections.push(Section.fromSectionTags(startTag, tag));
-            tagOpenedFlag = false;
+            let newSection = Section.openNewSection(tag);
+
+            sections.push(newSection);
+            lastSection = newSection;
+            isOpen = true;
         }
     }
-    
-    // In the future, this could be ran while the CI still runs. Might want to add 'not finished yet' to a section
-    return sections;
+    //TODO: update visualization on any updates
 }

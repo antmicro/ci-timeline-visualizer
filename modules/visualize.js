@@ -6,6 +6,10 @@ export function visualize(parentElement, sections) {
 
     let overallTimeSum = 0;
     for(const section of sections) {
+        if(section.isOpen) {
+            overallTimeSum += Math.floor(Date.now() / 1000);
+            continue;
+        }
         overallTimeSum += section.timeTaken;
     }
 
@@ -20,6 +24,9 @@ export function visualize(parentElement, sections) {
         if(section.timeTaken == 0) {
             truePercent = 0;
         } else {
+            if(section.isOpen) {
+                section.timeTaken = Math.floor(Date.now() / 1000) - section.startTimestamp;
+            }
             truePercent = (section.timeTaken / overallTimeSum).toPrecision(2) * 100;
         }
 

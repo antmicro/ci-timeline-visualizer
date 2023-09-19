@@ -18,14 +18,14 @@ export class SectionTag {
 export class Section {
     sectionName = "";
 
-    startTimestamp = 0;
-    endTimestamp = 0;
+    startTimestamp = -1;
+    endTimestamp = -1;
 
-    startLine = 0;
-    endLine = 0;
+    startLine = -1;
+    endLine = -1;
 
     timeTaken = 0;
-
+    isOpen = true;
 
     constructor(sectionName, startTimestamp, endTimestamp, startLine, endLine) {
         this.sectionName = sectionName;
@@ -35,14 +35,39 @@ export class Section {
         this.endLine = endLine;
 
         this.timeTaken = endTimestamp - startTimestamp;
+        this.isOpen = false;
     }
 
-    static fromSectionTags(startSection, endSection) {
+    static fromSectionTags(startTag, endTag) {
+        return new Section(startTag.sectionName,
+                           startTag.unixTimestamp,
+                           endTag.unixTimestamp,
+                           startTag.lineNumber,
+                           endTag.lineNumber);
+    }
 
-        return new Section(startSection.sectionName,
-                           startSection.unixTimestamp,
-                           endSection.unixTimestamp,
-                           startSection.lineNumber,
-                           endSection.lineNumber);
+    static openNewSection(openingTag) {
+        if(openingTag.tagType != SectionTag.START)
+            throw new Error("Trying to open a section with a closing tag!");
+
+        let newSection = new Section();
+
+        newSection.sectionName = openingTag.sectionName;
+        newSection.startTimestamp = openingTag.unixTimestamp;
+        newSection.startLine = openingTag.lineNumber;
+        newSection.isOpen = true;
+
+        return newSection;
+    }
+
+    closeSection(closingTag) {
+        if(closingTag.tagType != SectionTag.STOP)
+            throw new Error("Trying to close a section with an opening tag!");
+
+        this.endTimestamp = closingTag.unixTimestamp;
+        this.endLine = closingTag.lineNumber;
+
+        this.timeTaken = this.endTimestamp - this.startTimestamp;
+        this.isOpen = false;
     }
 }
