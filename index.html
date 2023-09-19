@@ -13,7 +13,7 @@
 </body>
 <script type="module">
 
-    import {getJobLog, removeAnsi, parseJobLog, calculateTimes, visualize} from "./ci-timeline-visualizer.js"
+    import {getJobLog, removeAnsi, parseJobLog, convertToSections, visualize} from "./ci-timeline-visualizer.js"
 
     let jobLog = getJobLog();
     console.log(jobLog);
@@ -21,7 +21,7 @@
     console.log(jobLogClean);
     let sectionTags = parseJobLog(jobLogClean);
     console.log(sectionTags)
-    let times = calculateTimes(sectionTags);
+    let times = convertToSections(sectionTags);
     console.log(times);
 
     let testTimes1 = [

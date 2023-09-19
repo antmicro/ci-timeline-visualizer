@@ -15,6 +15,38 @@ class SectionTag {
     }
 }
 
+class Section {
+    sectionName = "";
+
+    startTimestamp = 0;
+    endTimestamp = 0;
+
+    startLine = 0;
+    endLine = 0;
+
+    timeTaken = 0;
+
+
+    constructor(sectionName, startTimestamp, endTimestamp, startLine, endLine) {
+        this.sectionName = sectionName;
+        this.startTimestamp = startTimestamp;
+        this.endTimestamp = endTimestamp;
+        this.startLine = startLine;
+        this.endLine = endLine;
+
+        this.timeTaken = endTimestamp - startTimestamp;
+    }
+
+    static fromSectionTags(startSection, endSection) {
+
+        return new Section(startSection.sectionName,
+                           startSection.unixTimestamp,
+                           endSection.unixTimestamp,
+                           startSection.lineNumber,
+                           endSection.lineNumber);
+    }
+}
+
 function getJobLog() { //reads from file
     let logSource = new XMLHttpRequest();
     logSource.open('GET', './joblogoutput.txt', false);
@@ -85,50 +117,49 @@ function parseJobLog(cleanJobLog) {
     return sectionTags;
 }
 
-function calculateTimes(sectionTags) {
-    // A simple section times data structure;
-    // array of tuples (section_name, time_in_seconds)
+function convertToSections(sectionTags) {
 
-    let sectionTimes = [];
+    let sections = [];
     // For now we'll trust that a section ends before another one starts
     let tagOpenedFlag = false;
+    let startTag;
     for(const tag of sectionTags) {
-        if(tagOpenedFlag) {
-            let newTime = tag.unixTimestamp - startTagTime;
-            sectionTimes.push([tag.sectionName, newTime]);
-            tagOpenedFlag = false;
-        } else {
-            var startTagTime = tag.unixTimestamp;
+        if(!tagOpenedFlag) {
+            startTag = tag;
             tagOpenedFlag = true;
+        } else {
+            sections.push(Section.fromSectionTags(startTag, tag));
+            tagOpenedFlag = false;
         }
     }
     
     // In the future, this could be ran while the CI still runs. Might want to add 'not finished yet' to a section
-    return sectionTimes;
+    return sections;
 }
 
-function visualize(parentElement, sectionTimes) {
+function visualize(parentElement, sections) {
     // as in minimum width%
-    // inputting a value > 100/sectionTimes.length is a bad idea
+    // inputting a value > 100/sections.length is a bad idea
     let minimumWidth = 5; 
 
 
     let overallTimeSum = 0;
-    for(const section of sectionTimes) {
-        overallTimeSum += section[1];
+    for(const section of sections) {
+        overallTimeSum += section.timeTaken;
     }
 
 
-    // Get true percentages of time taken and attach them to sectionTimes, and
+    // Get true percentages of time taken and create a table of [Section, truePercent] tuples, and
     // determine the surplus of percentages
     let surplus = 0;
     let nonMinimumTimes = 0;
-    for(const section of sectionTimes) {
+    let percentTable = [];
+    for(const section of sections) {
         let truePercent;
-        if(section[1] == 0) {
+        if(section.timeTaken == 0) {
             truePercent = 0;
         } else {
-            truePercent = (section[1] / overallTimeSum).toPrecision(2) * 100;
+            truePercent = (section.timeTaken / overallTimeSum).toPrecision(2) * 100;
         }
 
         if(truePercent < minimumWidth) {
@@ -137,27 +168,27 @@ function visualize(parentElement, sectionTimes) {
             nonMinimumTimes += 1;
         }
 
-        section.push(truePercent);
+        percentTable.push([section, truePercent]);
     }
 
     // Subtract the surplus equally from all non-minimum times, and
     // create the UI
     let equalizationValue = (surplus / nonMinimumTimes).toPrecision(2);
-    for(const section of sectionTimes) {
-        let uiPercent = section[2];
+    for(const percentTuple of percentTable) {
+        let uiPercent = percentTuple[1];
         if(uiPercent <= minimumWidth) {
             uiPercent = minimumWidth;
         } else {
             uiPercent -= equalizationValue;
         }
 
-        parentElement.appendChild(createSectionDiv(section[0], uiPercent));
+        parentElement.appendChild(createSectionDiv(percentTuple[0], uiPercent));
     }
 
 
 }
 
-function createSectionDiv(name, percent) {
+function createSectionDiv(section, percent) {
     let newDiv = document.createElement("div");
     newDiv.setAttribute("class", "section");
     newDiv.setAttribute("style", "width: " + percent + "%")
@@ -181,4 +212,4 @@ let testTimes2 = [
     ["d", 85]
 ];
 
-export {getJobLog, getJobLogFromAPI, removeAnsi, parseJobLog, calculateTimes, visualize}
+export {getJobLog, getJobLogFromAPI, removeAnsi, parseJobLog, convertToSections, visualize}
