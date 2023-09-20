@@ -54,24 +54,24 @@ export function visualize(parentElement, sections) {
             uiPercent -= equalizationValue;
         }
 
-        parentElement.appendChild(createSectionDiv(percentTuple[0], uiPercent));
+        parentElement.appendChild(createSectionDiv(percentTuple[0], uiPercent, percentTuple[1]));
     }
 
 
 }
 
-export function createSectionDiv(section, percent) {
+export function createSectionDiv(section, percent, truePercent) {
     let newDiv = document.createElement("div");
     newDiv.setAttribute("class", "section");
     newDiv.setAttribute("style", "width: " + percent + "%")
-    createTooltip(newDiv, section);
+    createTooltip(newDiv, section, truePercent);
     //newDiv.onmouseover = (event) => {}; // create tooltip!
     //newDiv.onmouseleave = (event) => {};
 
     return newDiv;
 }
 
-function createTooltip(parent, section) {
+function createTooltip(parent, section, truePercent) {
     let tooltip = document.createElement("div");
     tooltip.setAttribute("class", "tooltip");
 
@@ -97,7 +97,7 @@ function createTooltip(parent, section) {
 
     let sectionShare = document.createElement("span");
     sectionShare.setAttribute("class", "section-share");
-    sectionShare.innerText = "36.24%";
+    sectionShare.innerText = truePercent.toFixed(2) + "%";
 
     innerTooltip.appendChild(sectionName);
     innerTooltip.appendChild(document.createElement("br"));
