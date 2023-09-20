@@ -9,10 +9,7 @@ export function visualize(parentElement, sections) {
 
     let overallTimeSum = 0;
     for (const section of sections) {
-        if (section.isOpen) {
-            section.timeTaken = Math.floor(Date.now() / 1000) - section.startTimestamp;
-        }
-        overallTimeSum += section.timeTaken;
+        overallTimeSum += section.duration;
     }
 
 
@@ -23,10 +20,10 @@ export function visualize(parentElement, sections) {
     let percentTable = [];
     for (const section of sections) {
         let truePercent;
-        if (section.timeTaken == 0) {
+        if (section.duration == 0) {
             truePercent = 0;
         } else {
-            truePercent = (section.timeTaken / overallTimeSum).toPrecision(2) * 100;
+            truePercent = (section.duration / overallTimeSum).toPrecision(2) * 100;
         }
 
         if (truePercent < minimumWidth) {
@@ -67,8 +64,55 @@ export function createSectionDiv(section, percent) {
     let newDiv = document.createElement("div");
     newDiv.setAttribute("class", "section");
     newDiv.setAttribute("style", "width: " + percent + "%")
+    createTooltip(newDiv, section);
     //newDiv.onmouseover = (event) => {}; // create tooltip!
     //newDiv.onmouseleave = (event) => {};
 
     return newDiv;
+}
+
+function createTooltip(parent, section) {
+    let tooltip = document.createElement("div");
+    tooltip.setAttribute("class", "tooltip");
+
+    let triangle = document.createElement("div");
+    triangle.setAttribute("class", "triangle");
+
+    let innerTooltip = document.createElement("div");
+    innerTooltip.setAttribute("class", "inner-tooltip");
+
+    let sectionName = document.createElement("span");
+    sectionName.setAttribute("class", "section-name");
+    sectionName.innerText = section.sectionName;
+
+    let sectionTime = document.createElement("span");
+    sectionTime.setAttribute("class", "section-time");
+    let times = [0, 0, 0]; // [hours, minutes, seconds]
+    let duration = section.duration;
+    times[0] = Math.floor(duration/3600);
+    times[1] = Math.floor((duration - times[0]*3600)/60);
+    times[2] = duration - times[0]*3600 - times[1]*60;
+    times = times.map((time) => String(time).padStart(2, '0'));
+    sectionTime.innerText = times.join(":");
+
+    let sectionShare = document.createElement("span");
+    sectionShare.setAttribute("class", "section-share");
+    sectionShare.innerText = "36.24%";
+
+    innerTooltip.appendChild(sectionName);
+    innerTooltip.appendChild(document.createElement("br"));
+    innerTooltip.appendChild(sectionTime);
+    innerTooltip.appendChild(document.createElement("br"));
+    innerTooltip.appendChild(sectionShare);
+
+    tooltip.appendChild(triangle);
+    tooltip.appendChild(innerTooltip);
+
+    parent.appendChild(tooltip);
+
+}
+
+function showTooltip(sectionDiv, section) {
+    let tooltip = sectionDiv.find
+
 }

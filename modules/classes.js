@@ -24,7 +24,7 @@ export class Section {
     startLine = -1;
     endLine = -1;
 
-    timeTaken = 0;
+    #duration = undefined;
     isOpen = true;
 
     constructor(sectionName, startTimestamp, endTimestamp, startLine, endLine) {
@@ -34,7 +34,7 @@ export class Section {
         this.startLine = startLine;
         this.endLine = endLine;
 
-        this.timeTaken = endTimestamp - startTimestamp;
+        this.#duration = endTimestamp - startTimestamp;
         this.isOpen = false;
     }
 
@@ -67,7 +67,13 @@ export class Section {
         this.endTimestamp = closingTag.unixTimestamp;
         this.endLine = closingTag.lineNumber;
 
-        this.timeTaken = this.endTimestamp - this.startTimestamp;
+        this.#duration = this.endTimestamp - this.startTimestamp;
         this.isOpen = false;
+    }
+
+    get duration() {
+        if(this.isOpen)
+            return Math.floor(Date.now() / 1000) - this.startTimestamp;
+        return this.#duration;
     }
 }
