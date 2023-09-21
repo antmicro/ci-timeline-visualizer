@@ -71,6 +71,11 @@ export class GUI {
         // Create UISections matching the data
         for (const i in sections) {
             let newUISection = new UISection();
+            if (i==0) {
+                newUISection.setLeftmost();
+            } else if (i==sections.length-1) {
+                newUISection.setRightmost();
+            }
             newUISection.update(sections[i].sectionName, sections[i].duration, percentTable[i][0], percentTable[i][1]);
             this.uiSections.push(newUISection);
         }

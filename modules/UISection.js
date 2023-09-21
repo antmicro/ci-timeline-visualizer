@@ -20,4 +20,12 @@ export class UISection {
         this.sectionDiv.setAttribute("style", "width: " + uiPercent + "%");
         this.tooltip.update(name, duration, truePercent);
     }
+
+    setLeftmost() {
+        this.sectionDiv.classList.add("leftmost");
+    }
+
+    setRightmost() {
+        this.sectionDiv.classList.add("rightmost");
+    }
 }

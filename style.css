@@ -4,16 +4,28 @@
     position: relative;
     display: flex;
     flex-direction: row;
-    background-color: black;
+    background-color: transparent;
     width: 1000px;
-    height: 100px;
+    height: 20px;
 }
 
 #ci-timeline-visualizer > .section {
     background-color: lightblue;
+    box-sizing: border-box;
+    border-color: black;
     border-style: solid;
     border-width: 2px;
     height: 100%;
+}
+
+#ci-timeline-visualizer > .section.leftmost {
+    border-top-left-radius: 35%;
+    border-bottom-left-radius: 35%;
+}
+
+#ci-timeline-visualizer > .section.rightmost {
+    border-top-right-radius: 35%;
+    border-bottom-right-radius: 35%;
 }
 
 #ci-timeline-visualizer .section .tooltip {
