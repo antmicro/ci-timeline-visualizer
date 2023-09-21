@@ -1,6 +1,6 @@
 import {getLogFromFile, getLogFromAPI} from "./modules/fetch-log.js"
 import {removeAnsi, parseJobLog, updateSections} from "./modules/parse.js";
-import { GUI } from "./modules/visualize.js";
+import { GUI } from "./modules/GUI.js";
 import { State } from "./modules/global-state.js";
 
 
