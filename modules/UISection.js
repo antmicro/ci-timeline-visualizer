@@ -11,6 +11,9 @@ export class UISection {
 
         this.tooltip = new Tooltip();
         this.sectionDiv.appendChild(this.tooltip.tooltipDiv);
+
+        this.sectionDiv.addEventListener("mouseover", (e) => {this.tooltip.show(e)});
+        this.sectionDiv.addEventListener("mouseout", (e) => {this.tooltip.hide(e)});
     }
 
     update(name, duration, truePercent, uiPercent) {

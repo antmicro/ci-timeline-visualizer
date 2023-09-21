@@ -24,6 +24,17 @@
     top: 100%;
     left: 50%;
     transform: translate(-50%, 0);
+
+    pointer-events: none;
+    user-select: none;
+
+    transition: opacity 0.15s linear;
+
+    opacity: 0;
+}
+
+#ci-timeline-visualizer .section .tooltip.show {
+    opacity: 0.9;
 }
 
 #ci-timeline-visualizer .section .tooltip .triangle {

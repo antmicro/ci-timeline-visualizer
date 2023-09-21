@@ -48,4 +48,14 @@ export class Tooltip {
 
         this.sectionShare.innerText = Number(share).toFixed(2) + "%";
     }
+
+    show(event) {
+        if(event.target.classList.contains("section"))
+            this.tooltipDiv.classList.add("show");
+    }
+
+    hide(event) {
+        if(event.target.classList.contains("section"))
+            this.tooltipDiv.classList.remove("show");
+    }
 }
