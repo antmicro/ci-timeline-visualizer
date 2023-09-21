@@ -19,13 +19,13 @@
 }
 
 #ci-timeline-visualizer > .section.leftmost {
-    border-top-left-radius: 35%;
-    border-bottom-left-radius: 35%;
+    border-top-left-radius: 7px;
+    border-bottom-left-radius: 7px;
 }
 
 #ci-timeline-visualizer > .section.rightmost {
-    border-top-right-radius: 35%;
-    border-bottom-right-radius: 35%;
+    border-top-right-radius: 7px;
+    border-bottom-right-radius: 7px;
 }
 
 #ci-timeline-visualizer .section .tooltip {

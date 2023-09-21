@@ -85,4 +85,12 @@ export class GUI {
             this.parentElement.appendChild(uiSection.sectionDiv);
         }
     }
+
+    reset(sections) {
+        while(this.parentElement.firstChild) {
+            this.parentElement.removeChild(this.parentElement.lastChild);
+        }
+        this.uiSections = [];
+        this.initialize(sections);
+    }
 }
