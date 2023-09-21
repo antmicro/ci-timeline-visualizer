@@ -1,6 +1,6 @@
 import {getLogFromFile, getLogFromAPI} from "./modules/fetch-log.js"
 import {removeAnsi, parseJobLog, updateSections} from "./modules/parse.js";
-import {visualize, createSectionDiv} from "./modules/visualize.js";
+import { GUI } from "./modules/visualize.js";
 import { State } from "./modules/global-state.js";
 
 
@@ -13,4 +13,5 @@ console.log(sectionTags)
 updateSections(sectionTags);
 console.log(State.instance().sections);
 
-visualize(document.getElementById("ci-timeline-visualizer"), State.instance().sections);
+let gui = new GUI(document.getElementById("ci-timeline-visualizer"), 2);
+gui.initialize(State.instance().sections);

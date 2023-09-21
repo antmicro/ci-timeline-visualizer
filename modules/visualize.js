@@ -1,118 +1,153 @@
-export function visualize(parentElement, sections) {
-    // as in minimum width %
-    let minimumWidth = 2;
-    if (minimumWidth > 100 / sections.length) {
-        console.log("[ci-timeline-visualizer] Minimum width is too large for this many sections; changing it to 0");
-        minimumWidth = 0;
+export class GUI {
+    minimumWidth = 2;
+    overallDuration = 0;
+
+    parentElement;
+    uiSections = [];
+
+    constructor(parentElement, minimumWidth) {
+        this.parentElement = parentElement;
+        this.minimumWidth = minimumWidth;
+        this.uiSections = [];
     }
 
-
-    let overallTimeSum = 0;
-    for (const section of sections) {
-        overallTimeSum += section.duration;
-    }
-
-
-    // Get true percentages of time taken and create a table of [Section, truePercent] tuples, and
-    // determine the surplus of percentages
-    let surplus = 0;
-    let nonMinimumWidths = 0;
-    let percentTable = [];
-    for (const section of sections) {
-        let truePercent;
-        if (section.duration == 0) {
-            truePercent = 0;
-        } else {
-            truePercent = (section.duration / overallTimeSum).toPrecision(2) * 100;
+    initialize(sections) {
+        // Initial checks
+        if (this.minimumWidth > (100 / sections.length)) {
+            console.log("[ci-timeline-visualizer] Minimum width is too large for this many sections; changing it to 0");
+            minimumWidth = 0;
         }
 
-        if (truePercent < minimumWidth) {
-            surplus += minimumWidth - truePercent;
-        } else if (truePercent > minimumWidth) {
-            nonMinimumWidths += 1;
-        }
-
-        percentTable.push([section, truePercent]);
-    }
-
-    // If there are only minimum times (everything took 0 seconds) then draw all sections equally
-    if (nonMinimumWidths == 0) {
+        // Aggregate data
+        let overallDuration = 0;
         for (const section of sections) {
-            parentElement.appendChild(createSectionDiv(section, (100 / sections.length).toPrecision(2)));
-        }
-        return;
-    }
-
-    // Subtract the surplus equally from all non-minimum times, and
-    // create the UI
-    let equalizationValue = (surplus / nonMinimumWidths).toPrecision(2);
-    for (const percentTuple of percentTable) {
-        let uiPercent = percentTuple[1];
-        if (uiPercent <= minimumWidth) {
-            uiPercent = minimumWidth;
-        } else {
-            uiPercent -= equalizationValue;
+            overallDuration += section.duration;
         }
 
-        parentElement.appendChild(createSectionDiv(percentTuple[0], uiPercent, percentTuple[1]));
+
+        let surplus = 0;
+        let nonMinimumWidths = 0;
+        let percentTable = []; // array of tuples [truePercent, uiPercent]
+        // Get true percentages, surplus and amnt of non-minimum widths
+        for (const section of sections) {
+            let truePercent;
+            if (section.duration == 0) {
+                truePercent = 0;
+            } else {
+                truePercent = (section.duration / overallDuration).toPrecision(2) * 100;
+            }
+
+            if (truePercent < this.minimumWidth) {
+                surplus += this.minimumWidth - truePercent;
+            } else if (truePercent > this.minimumWidth) {
+                nonMinimumWidths += 1;
+            }
+
+            percentTable.push([truePercent]);
+        }
+
+        if (nonMinimumWidths == 0) {
+            for (const tuple of percentTable) {
+                tuple.push((100/sections.length).toPrecision(2));
+            }
+            return;
+        }
+
+        // Subtract the surplus equally from all non-minimum times, and
+        // create the UI
+        let equalizationValue = (surplus / nonMinimumWidths).toPrecision(2);
+        for (const tuple of percentTable) {
+            let uiPercent = tuple[0];
+            if (uiPercent <= this.minimumWidth) {
+                uiPercent = this.minimumWidth;
+            } else {
+                uiPercent -= equalizationValue;
+            }
+            tuple.push(uiPercent);
+        }
+
+        // Create UISections matching the data
+        for (const i in sections) {
+            let newUISection = new UISection();
+            newUISection.update(sections[i].sectionName, sections[i].duration, percentTable[i][0], percentTable[i][1]);
+            this.uiSections.push(newUISection);
+        }
+
+        // Connect UISections to parent element
+        for (const uiSection of this.uiSections) {
+            this.parentElement.appendChild(uiSection.sectionDiv);
+        }
+
+    }
+}
+
+export class UISection {
+    sectionDiv;
+
+    tooltip;
+
+    constructor() {
+        this.sectionDiv = document.createElement("div");
+        this.sectionDiv.setAttribute("class", "section");
+
+        this.tooltip = new Tooltip();
+        this.sectionDiv.appendChild(this.tooltip.tooltipDiv);
     }
 
-
+    update(name, duration, truePercent, uiPercent) {
+        this.sectionDiv.setAttribute("style", "width: " + uiPercent + "%");
+        this.tooltip.update(name, duration, truePercent);
+    }
 }
 
-export function createSectionDiv(section, percent, truePercent) {
-    let newDiv = document.createElement("div");
-    newDiv.setAttribute("class", "section");
-    newDiv.setAttribute("style", "width: " + percent + "%")
-    createTooltip(newDiv, section, truePercent);
-    //newDiv.onmouseover = (event) => {}; // create tooltip!
-    //newDiv.onmouseleave = (event) => {};
+export class Tooltip {
+    tooltipDiv;
+    triangle;
+    innerTooltip;
 
-    return newDiv;
-}
+    sectionName;
+    sectionTime;
+    sectionShare;
 
-function createTooltip(parent, section, truePercent) {
-    let tooltip = document.createElement("div");
-    tooltip.setAttribute("class", "tooltip");
+    constructor() {
+        this.tooltipDiv = document.createElement("div");
+        this.tooltipDiv.setAttribute("class", "tooltip");
 
-    let triangle = document.createElement("div");
-    triangle.setAttribute("class", "triangle");
+        this.triangle = document.createElement("div");
+        this.triangle.setAttribute("class", "triangle");
 
-    let innerTooltip = document.createElement("div");
-    innerTooltip.setAttribute("class", "inner-tooltip");
+        this.innerTooltip = document.createElement("div");
+        this.innerTooltip.setAttribute("class", "inner-tooltip");
 
-    let sectionName = document.createElement("span");
-    sectionName.setAttribute("class", "section-name");
-    sectionName.innerText = section.sectionName;
+        this.sectionName = document.createElement("span");
+        this.sectionName.setAttribute("class", "section-name");
 
-    let sectionTime = document.createElement("span");
-    sectionTime.setAttribute("class", "section-time");
-    let times = [0, 0, 0]; // [hours, minutes, seconds]
-    let duration = section.duration;
-    times[0] = Math.floor(duration/3600);
-    times[1] = Math.floor((duration - times[0]*3600)/60);
-    times[2] = duration - times[0]*3600 - times[1]*60;
-    times = times.map((time) => String(time).padStart(2, '0'));
-    sectionTime.innerText = times.join(":");
+        this.sectionTime = document.createElement("span");
+        this.sectionTime.setAttribute("class", "section-time");
 
-    let sectionShare = document.createElement("span");
-    sectionShare.setAttribute("class", "section-share");
-    sectionShare.innerText = truePercent.toFixed(2) + "%";
+        this.sectionShare = document.createElement("span");
+        this.sectionShare.setAttribute("class", "section-share");
 
-    innerTooltip.appendChild(sectionName);
-    innerTooltip.appendChild(document.createElement("br"));
-    innerTooltip.appendChild(sectionTime);
-    innerTooltip.appendChild(document.createElement("br"));
-    innerTooltip.appendChild(sectionShare);
+        this.innerTooltip.appendChild(this.sectionName);
+        this.innerTooltip.appendChild(document.createElement("br"));
+        this.innerTooltip.appendChild(this.sectionTime);
+        this.innerTooltip.appendChild(document.createElement("br"));
+        this.innerTooltip.appendChild(this.sectionShare);
 
-    tooltip.appendChild(triangle);
-    tooltip.appendChild(innerTooltip);
+        this.tooltipDiv.appendChild(this.triangle);
+        this.tooltipDiv.appendChild(this.innerTooltip);
+    }
+    
+    update(name, duration, share) {
+        this.sectionName.innerText = name;
 
-    parent.appendChild(tooltip);
+        let times = [0, 0, 0]; // [hours, minutes, seconds]
+        times[0] = Math.floor(duration/3600);
+        times[1] = Math.floor((duration - times[0]*3600)/60);
+        times[2] = duration - times[0]*3600 - times[1]*60;
+        times = times.map((time) => String(time).padStart(2, '0'));
+        this.sectionTime.innerText = times.join(":");
 
-}
-
-function showTooltip(sectionDiv, section) {
-    let tooltip = sectionDiv.find
-
+        this.sectionShare.innerText = Number(share).toFixed(2) + "%";
+    }
 }
