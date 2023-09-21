@@ -1,4 +1,5 @@
 import { Tooltip } from "./Tooltip.js";
+import { ColorGenerator } from "./ColorGenerator.js";
 
 export class UISection {
     sectionDiv;
@@ -17,7 +18,7 @@ export class UISection {
     }
 
     update(name, duration, truePercent, uiPercent) {
-        this.sectionDiv.setAttribute("style", "width: " + uiPercent + "%");
+        this.sectionDiv.setAttribute("style", "width: " + uiPercent + `%; background-color: ${ColorGenerator.getSectionColor(name).toCSS()}`);
         this.tooltip.update(name, duration, truePercent);
     }
 
