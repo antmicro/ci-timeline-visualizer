@@ -4,6 +4,7 @@ import { ColorGenerator } from "./ColorGenerator.js";
 export class UISection {
     sectionDiv;
 
+    color;
     tooltip;
 
     constructor() {
@@ -18,7 +19,7 @@ export class UISection {
     }
 
     update(name, duration, truePercent, uiPercent) {
-        this.sectionDiv.setAttribute("style", "width: " + uiPercent + `%; background-color: ${ColorGenerator.getSectionColor(name).toCSS()}`);
+        this.sectionDiv.style["width"] = uiPercent + "%";
         this.tooltip.update(name, duration, truePercent);
     }
 
@@ -28,5 +29,10 @@ export class UISection {
 
     setRightmost() {
         this.sectionDiv.classList.add("rightmost");
+    }
+
+    setColor(color) {
+        this.color = color;
+        this.sectionDiv.style["background-color"] = this.color.toCSS();
     }
 }

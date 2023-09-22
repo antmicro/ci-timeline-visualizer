@@ -31,14 +31,18 @@ export class ColorGenerator {
 
     static colorParameters = {
         minSaturation: 60,
-        minLightness: 0.6
+        maxSaturation: 100,
+        minLightness: 40,
+        maxLightness: 80,
+        minDistance: 0.2,
+        maxNonCollidingAttempts: 1000
     }
 
-    static getSectionColor(sectionName) {
+    static getSectionColor(sectionName, colorList) {
         let newColor = knownColors.get(sectionName);
 
         if (newColor == null) {
-            newColor = ColorGenerator.getSeededDistantRandomColor(sectionName)
+            newColor = ColorGenerator.getSeededDistantRandomColor(sectionName, colorList);
         }
         return newColor;
     }
@@ -50,13 +54,33 @@ export class ColorGenerator {
         for (const char of sectionName) {
             seed += char.charCodeAt(0);
         }
-        let newHue = ColorGenerator.mulberry32(seed) * 360;
-        let newSaturation = ColorGenerator.normalizeValue(ColorGenerator.mulberry32(seed+1) * 100, ColorGenerator.colorParameters.minSaturation, 100);
-        let newLightness = ColorGenerator.mulberry32(seed+2) * 100;
 
-        let newHSL = new HSL(newHue, newSaturation, newLightness);
+        let newHSL;
+        let attempts = 0;
+        do {
+            let newHue = ColorGenerator.mulberry32(seed) * 360;
+            let newSaturation = ColorGenerator.lerp(ColorGenerator.mulberry32(seed+1),
+                                                    ColorGenerator.colorParameters.minSaturation,
+                                                    ColorGenerator.colorParameters.maxSaturation);
+            let newLightness = ColorGenerator.lerp(ColorGenerator.mulberry32(seed+2),
+                                                ColorGenerator.colorParameters.minLightness,
+                                                ColorGenerator.colorParameters.maxLightness);
 
-        return newHSL
+
+            newHSL = new HSL(newHue, newSaturation, newLightness);
+            seed += 1;
+            attempts += 1;
+        } while (this.colorCollisionCheck(newHSL, colorList) && attempts < this.colorParameters.maxNonCollidingAttempts)
+
+        return newHSL;
+    }
+
+    static colorCollisionCheck(color, colorList) {
+        for (const existingColor of colorList) {
+            if (this.getColorDistance(color, existingColor) < ColorGenerator.colorParameters.minDistance)
+                return true;
+        }
+        return false;
     }
 
     static getColorDistance(color1, color2) {
@@ -67,9 +91,9 @@ export class ColorGenerator {
         componentDistances[1] = Math.abs(color1.saturation - color2.saturation);
         componentDistances[2] = Math.abs(color1.lightness - color2.lightness);
 
-        componentDistances[0] = normalizeValue(componentDistances[0], 0, 180);
-        componentDistances[1] = normalizeValue(componentDistances[1], 0, 100);
-        componentDistances[2] = normalizeValue(componentDistances[2], 0, 100);
+        componentDistances[0] = this.normalizeValue(componentDistances[0], 0, 180);
+        componentDistances[1] = this.normalizeValue(componentDistances[1], 0, 100);
+        componentDistances[2] = this.normalizeValue(componentDistances[2], 0, 100);
 
         let weights = [1, 0.3, 0.3];
 
@@ -82,6 +106,10 @@ export class ColorGenerator {
 
     static normalizeValue(val, min, max) {
         return (val - min) / (max - min);
+    }
+
+    static lerp(val, min, max) {
+        return val * (max - min) + min;
     }
 
     // This is a simple pseudo-random number generator.
