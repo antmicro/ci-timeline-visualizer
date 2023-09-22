@@ -31,6 +31,11 @@ export class UISection {
         this.sectionDiv.classList.add("rightmost");
     }
 
+    setMiddle() {
+        this.sectionDiv.classList.remove("leftmost");
+        this.sectionDiv.classList.remove("rightmost");
+    }
+
     setColor(color) {
         this.color = color;
         this.sectionDiv.style["background-color"] = this.color.toCSS();

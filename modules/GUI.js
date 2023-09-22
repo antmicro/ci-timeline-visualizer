@@ -3,10 +3,10 @@ import { HSL, ColorGenerator } from "./ColorGenerator.js";
 
 export class GUI {
     minimumWidth = 2;
-    overallDuration = 0;
 
     parentElement;
     uiSections = [];
+    existingColors = [];
 
     constructor(parentElement, minimumWidth) {
         this.parentElement = parentElement;
@@ -14,14 +14,64 @@ export class GUI {
         this.uiSections = [];
     }
 
-    initialize(sections) {
-        // Initial checks
-        if (this.minimumWidth > (100 / sections.length)) {
-            console.log("[ci-timeline-visualizer] Minimum width is too large for this many sections; changing it to 0");
-            minimumWidth = 0;
+    update(sections) {
+        this.#minimumWidthCheck(sections.length);
+
+        let percentages = this.#calculatePercentages(sections);
+
+        for (const i in sections) {
+            if (this.uiSections[i] != null) {
+                this.uiSections[i].update(
+                    sections[i].sectionName,
+                    sections[i].duration,
+                    percentages[i][0],
+                    percentages[i][1]);
+            } else {
+                this.addNewUISection(
+                    sections[i].sectionName,
+                    sections[i].duration,
+                    percentages[i][0],
+                    percentages[i][1]);
+            }
         }
 
-        // Aggregate data
+
+    }
+
+    reset(sections) {
+        while (this.parentElement.firstChild) {
+            this.parentElement.removeChild(this.parentElement.lastChild);
+        }
+        this.uiSections = [];
+        this.initialize(sections);
+    }
+
+    addNewUISection(name, duration, truePercent, uiPercent) {
+        let newUISection = new UISection();
+        if (this.uiSections[0] == null) {
+            newUISection.setLeftmost();
+        } else {
+            let lastSectionPosition = this.uiSections.length - 1;
+            if (lastSectionPosition != 0)
+                this.uiSections[lastSectionPosition].setMiddle();
+            newUISection.setRightmost();
+        }
+        let newColor = ColorGenerator.getSectionColor(name, this.existingColors);
+        newUISection.update(name, duration, truePercent, uiPercent);
+        newUISection.setColor(newColor);
+        this.existingColors.push(newColor);
+        this.uiSections.push(newUISection);
+        this.parentElement.appendChild(newUISection.sectionDiv);
+    }
+
+    #minimumWidthCheck(sectionsAmount) {
+        if (this.minimumWidth > (100 / sectionsAmount)) {
+            console.log("[ci-timeline-visualizer] Minimum width is too large for this many sections; changing it to 0");
+            this.minimumWidth = 0;
+        }
+    }
+
+    #calculatePercentages(sections) {
         let overallDuration = 0;
         for (const section of sections) {
             overallDuration += section.duration;
@@ -51,13 +101,12 @@ export class GUI {
 
         if (nonMinimumWidths == 0) {
             for (const tuple of percentTable) {
-                tuple.push((100/sections.length).toPrecision(2));
+                tuple.push((100 / sections.length).toPrecision(2));
             }
             return;
         }
 
-        // Subtract the surplus equally from all non-minimum times, and
-        // create the UI
+        // Subtract the surplus equally from all non-minimum times
         let equalizationValue = (surplus / nonMinimumWidths).toPrecision(2);
         for (const tuple of percentTable) {
             let uiPercent = tuple[0];
@@ -69,36 +118,6 @@ export class GUI {
             tuple.push(uiPercent);
         }
 
-        // Create UISections matching the data
-        let existingColors = [];
-        for (const i in sections) {
-            let newUISection = new UISection();
-            if (i==0) {
-                newUISection.setLeftmost();
-            } else if (i==sections.length-1) {
-                newUISection.setRightmost();
-            }
-            newUISection.update(sections[i].sectionName,
-                                sections[i].duration,
-                                percentTable[i][0],
-                                percentTable[i][1]);
-            let newColor = ColorGenerator.getSectionColor(sections[i].sectionName, existingColors);
-            newUISection.setColor(newColor);
-            existingColors.push(newColor);
-            this.uiSections.push(newUISection);
-        }
-
-        // Connect UISections to parent element
-        for (const uiSection of this.uiSections) {
-            this.parentElement.appendChild(uiSection.sectionDiv);
-        }
-    }
-
-    reset(sections) {
-        while(this.parentElement.firstChild) {
-            this.parentElement.removeChild(this.parentElement.lastChild);
-        }
-        this.uiSections = [];
-        this.initialize(sections);
+        return percentTable;
     }
 }
