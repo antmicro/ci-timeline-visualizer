@@ -1,6 +1,6 @@
 export class State {
     static #instance;
-    
+
     static instance() {
         if (State.#instance == null) {
             State.#instance = new State();

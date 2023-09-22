@@ -1,5 +1,5 @@
-import {getLogFromFile, getLogFromAPI} from "./modules/fetch-log.js"
-import {Parser} from "./modules/Parser.js";
+import { getLogFromFile, getLogFromAPI } from "./modules/fetch-log.js"
+import { Parser } from "./modules/Parser.js";
 import { GUI } from "./modules/GUI.js";
 import { State } from "./modules/global-state.js";
 

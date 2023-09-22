@@ -39,15 +39,16 @@ export class Section {
     }
 
     static fromSectionTags(startTag, endTag) {
-        return new Section(startTag.sectionName,
-                           startTag.unixTimestamp,
-                           endTag.unixTimestamp,
-                           startTag.lineNumber,
-                           endTag.lineNumber);
+        return new Section(
+            startTag.sectionName,
+            startTag.unixTimestamp,
+            endTag.unixTimestamp,
+            startTag.lineNumber,
+            endTag.lineNumber);
     }
 
     static openNewSection(openingTag) {
-        if(openingTag.tagType != SectionTag.START)
+        if (openingTag.tagType != SectionTag.START)
             throw new Error("Trying to open a section with a closing tag!");
 
         let newSection = new Section();
@@ -61,7 +62,7 @@ export class Section {
     }
 
     closeSection(closingTag) {
-        if(closingTag.tagType != SectionTag.STOP)
+        if (closingTag.tagType != SectionTag.STOP)
             throw new Error("Trying to close a section with an opening tag!");
 
         this.endTimestamp = closingTag.unixTimestamp;
@@ -72,7 +73,7 @@ export class Section {
     }
 
     get duration() {
-        if(this.isOpen)
+        if (this.isOpen)
             return Math.floor(Date.now() / 1000) - this.startTimestamp;
         return this.#duration;
     }

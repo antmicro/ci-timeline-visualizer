@@ -35,14 +35,14 @@ export class Tooltip {
         this.tooltipDiv.appendChild(this.triangle);
         this.tooltipDiv.appendChild(this.innerTooltip);
     }
-    
+
     update(name, duration, share) {
         this.sectionName.innerText = name;
 
         let times = [0, 0, 0]; // [hours, minutes, seconds]
-        times[0] = Math.floor(duration/3600);
-        times[1] = Math.floor((duration - times[0]*3600)/60);
-        times[2] = duration - times[0]*3600 - times[1]*60;
+        times[0] = Math.floor(duration / 3600);
+        times[1] = Math.floor((duration - times[0] * 3600) / 60);
+        times[2] = duration - times[0] * 3600 - times[1] * 60;
         times = times.map((time) => String(time).padStart(2, '0'));
         this.sectionTime.innerText = times.join(":");
 
@@ -50,12 +50,12 @@ export class Tooltip {
     }
 
     show(event) {
-        if(event.target.classList.contains("section"))
+        if (event.target.classList.contains("section"))
             this.tooltipDiv.classList.add("show");
     }
 
     hide(event) {
-        if(event.target.classList.contains("section"))
+        if (event.target.classList.contains("section"))
             this.tooltipDiv.classList.remove("show");
     }
 }

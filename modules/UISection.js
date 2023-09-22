@@ -1,5 +1,4 @@
 import { Tooltip } from "./Tooltip.js";
-import { ColorGenerator } from "./ColorGenerator.js";
 
 export class UISection {
     sectionDiv;
@@ -14,8 +13,8 @@ export class UISection {
         this.tooltip = new Tooltip();
         this.sectionDiv.appendChild(this.tooltip.tooltipDiv);
 
-        this.sectionDiv.addEventListener("mouseover", (e) => {this.tooltip.show(e)});
-        this.sectionDiv.addEventListener("mouseout", (e) => {this.tooltip.hide(e)});
+        this.sectionDiv.addEventListener("mouseover", (e) => { this.tooltip.show(e) });
+        this.sectionDiv.addEventListener("mouseout", (e) => { this.tooltip.hide(e) });
     }
 
     update(name, duration, truePercent, uiPercent) {

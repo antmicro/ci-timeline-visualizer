@@ -59,12 +59,14 @@ export class ColorGenerator {
         let attempts = 0;
         do {
             let newHue = ColorGenerator.mulberry32(seed) * 360;
-            let newSaturation = ColorGenerator.lerp(ColorGenerator.mulberry32(seed+1),
-                                                    ColorGenerator.colorParameters.minSaturation,
-                                                    ColorGenerator.colorParameters.maxSaturation);
-            let newLightness = ColorGenerator.lerp(ColorGenerator.mulberry32(seed+2),
-                                                ColorGenerator.colorParameters.minLightness,
-                                                ColorGenerator.colorParameters.maxLightness);
+            let newSaturation = ColorGenerator.lerp(
+                ColorGenerator.mulberry32(seed + 1),
+                ColorGenerator.colorParameters.minSaturation,
+                ColorGenerator.colorParameters.maxSaturation);
+            let newLightness = ColorGenerator.lerp(
+                ColorGenerator.mulberry32(seed + 2),
+                ColorGenerator.colorParameters.minLightness,
+                ColorGenerator.colorParameters.maxLightness);
 
 
             newHSL = new HSL(newHue, newSaturation, newLightness);
