@@ -1,5 +1,6 @@
 import { UISection } from "./UISection.js";
-import { HSL, ColorGenerator } from "./ColorGenerator.js";
+import { ColorGenerator } from "./ColorGenerator.js";
+import { State } from "./global-state.js";
 
 export class GUI {
     minimumWidth = 2;
@@ -8,10 +9,34 @@ export class GUI {
     uiSections = [];
     existingColors = [];
 
+    pollMillis = 1000;
+    isPolling = false;
+
     constructor(parentElement, minimumWidth) {
         this.parentElement = parentElement;
         this.minimumWidth = minimumWidth;
         this.uiSections = [];
+        this.existingColors = [];
+        this.isPolling = false;
+    }
+
+    startPolling() {
+        this.isPolling = true;
+        this.poll();
+    }
+
+    stopPolling() {
+        this.isPolling = false;
+    }
+
+    async poll() {
+        if(!this.isPolling)
+            return;
+        this.update(State.instance().sections);
+
+        await new Promise(r => setTimeout(r, this.pollMillis));
+
+        this.poll();
     }
 
     update(sections) {

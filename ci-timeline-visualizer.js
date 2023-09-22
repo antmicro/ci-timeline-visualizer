@@ -13,7 +13,7 @@ console.log(State.instance().sections);
 
 
 let gui = new GUI(document.getElementById("ci-timeline-visualizer"), 2);
-gui.update(State.instance().sections);
+gui.startPolling();
 
 await new Promise(r => setTimeout(r, 3000));
 
@@ -21,7 +21,3 @@ let jobLog = getLogFromFile("test/sample-logs/unfinished-log1-rest.txt");
 //console.log(jobLog);
 parser.parse(jobLog);
 console.log(State.instance().sections);
-
-
-
-gui.update(State.instance().sections);
