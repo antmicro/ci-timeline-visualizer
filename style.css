@@ -39,6 +39,7 @@
 
     pointer-events: none;
     user-select: none;
+    z-index: 1000;
 
     transition: opacity 0.15s linear;
 
