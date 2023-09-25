@@ -4,14 +4,38 @@ ci-timeline-visualizer is an extension for GitLab's job logs to visualize the el
 
 ## Running
 
-`ci-timeline-visualizer.js` is a ES6 module, but the repository includes an `index.html` for demonstrational purposes.
+### Setting up local web server
+`ci-timeline-visualizer.js` is a ES6 module, but the repository includes an `index.html` for local execution purposes.
 
 Modules only work via HTTP, so you should use a local web server, such as:
 * Live Server, a VSCode extension
 * Node static server (not tested)
 * Node live server (not tested)
 
+The injection step assumes that the server is accessible at `http://localhost:5500/`. If you want or need to change it, you'd also need to change the URL in the injection script.
+
 If you try to run it locally (`file://`), you will be met with a CORS policy error.
+
+### Injecting
+Make sure you are on the job log page!
+
+The URL should look similar to `example.com/<project-path>/-/jobs/<job-id>`
+
+If you modify the loaded HTML file, the module code won't execute. Because of this, you need to insert the element into the DOM by the DevTools js console. The module additionally uses some CSS of its own that needs to be injected. Just paste the following into the console:
+```js
+let cssLink = document.createElement("link");
+cssLink.href = "http://localhost:5500/style.css";
+cssLink.type = "text/css";
+cssLink.rel = "stylesheet";
+document.getElementsByTagName("head")[0].appendChild(cssLink);
+
+let scripttag = document.createElement("script");
+scripttag.setAttribute("type", "module");
+scripttag.setAttribute("src", "http://localhost:5500/ci-timeline-visualizer.js");
+document.getElementsByTagName("html")[0].appendChild(scripttag);
+```
+
+You might be able to inject the above using an userscript agent (Tampermonkey for example) so that it happens automatically on page refresh. This has not been tested, however.
 
 ## GitLab's job log syntax
 
