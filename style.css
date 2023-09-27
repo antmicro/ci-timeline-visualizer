@@ -6,30 +6,34 @@
     flex-direction: row;
     background-color: transparent;
     width: 100%;
-    height: 20px;
+    height: 15px;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 #ci-timeline-visualizer > .section {
     background-color: lightblue;
     box-sizing: border-box;
     border-color: black;
-    border-style: solid;
-    border-width: 2px;
+    margin-right: 2px;
     height: 100%;
 }
 
 #ci-timeline-visualizer > .section.leftmost {
     border-top-left-radius: 7px;
     border-bottom-left-radius: 7px;
+    border-left: 2px solid
 }
 
 #ci-timeline-visualizer > .section.rightmost {
     border-top-right-radius: 7px;
     border-bottom-right-radius: 7px;
+    border-right: 2px solid;
+    margin-right: 0px;
 }
 
 #ci-timeline-visualizer .section .tooltip {
-    position: relative; /*position using js?*/
+    position: relative;
     display: block;
     width: min-content;
     margin: 0;

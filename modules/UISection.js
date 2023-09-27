@@ -1,9 +1,11 @@
 import { Tooltip } from "./Tooltip.js";
+import { HSL } from "./ColorGenerator.js";
 
 export class UISection {
     sectionDiv;
 
     color;
+    borderColor;
     tooltip;
 
     constructor() {
@@ -38,5 +40,11 @@ export class UISection {
     setColor(color) {
         this.color = color;
         this.sectionDiv.style["background-color"] = this.color.toCSS();
+        this.borderColor = new HSL(color.hue, color.saturation, color.lightness);
+
+        this.borderColor.saturation = Math.max(this.borderColor.saturation - 10, 0);
+        this.borderColor.lightness = Math.max(this.borderColor.lightness - 5, 0);
+        
+        this.sectionDiv.style["border-color"] = this.borderColor.toCSS();
     }
 }
