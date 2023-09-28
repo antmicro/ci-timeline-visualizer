@@ -46,7 +46,7 @@ export class Tooltip {
         times = times.map((time) => String(time).padStart(2, '0'));
         this.sectionTime.innerText = times.join(":");
 
-        this.sectionShare.innerText = Number(share).toFixed(2) + "%";
+        this.sectionShare.innerText = Math.round(Number(share) * 10) / 10 + "%";
     }
 
     show(event) {
