@@ -19,9 +19,10 @@ export class UISection {
         this.sectionDiv.addEventListener("mouseout", (e) => { this.tooltip.hide(e) });
     }
 
-    update(name, duration, truePercent, uiPercent) {
-        this.sectionDiv.style["width"] = uiPercent + "%";
-        this.tooltip.update(name, duration, truePercent);
+    update(name, duration, percent, minWidth) {
+        this.sectionDiv.style["min-width"] = minWidth + "%";
+        this.sectionDiv.style["width"] = percent + "%";
+        this.tooltip.update(name, duration, percent);
     }
 
     setLeftmost() {

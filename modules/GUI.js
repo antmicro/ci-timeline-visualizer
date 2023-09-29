@@ -49,14 +49,14 @@ export class GUI {
                 this.uiSections[i].update(
                     sections[i].sectionName,
                     sections[i].duration,
-                    percentages[i][0],
-                    percentages[i][1]);
+                    percentages[i],
+                    this.minimumWidth);
             } else {
                 this.addNewUISection(
                     sections[i].sectionName,
                     sections[i].duration,
-                    percentages[i][0],
-                    percentages[i][1]);
+                    percentages[i],
+                    this.minimumWidth);
             }
         }
 
@@ -102,47 +102,30 @@ export class GUI {
             overallDuration += section.duration;
         }
 
-
-        let surplus = 0;
         let nonMinimumWidths = 0;
-        let percentTable = []; // array of tuples [truePercent, uiPercent]
-        // Get true percentages, surplus and amnt of non-minimum widths
+        let percentages = [];
+
         for (const section of sections) {
-            let truePercent;
+            let percent;
             if (section.duration == 0) {
-                truePercent = 0;
+                percent = 0;
             } else {
-                truePercent = (section.duration / overallDuration).toPrecision(2) * 100;
+                percent = (section.duration / overallDuration).toPrecision(2) * 100;
             }
 
-            if (truePercent < this.minimumWidth) {
-                surplus += this.minimumWidth - truePercent;
-            } else if (truePercent > this.minimumWidth) {
+            if(percent > this.minimumWidth) {
                 nonMinimumWidths += 1;
             }
 
-            percentTable.push([truePercent]);
+            percentages.push(percent);
         }
 
+        // If everything is below minimum, divide equally
         if (nonMinimumWidths == 0) {
-            for (const tuple of percentTable) {
-                tuple.push((100 / sections.length).toPrecision(2));
+            for (const i in percentages) {
+                percentages[i] = (100 / sections.length).toPrecision(2);
             }
-            return;
         }
-
-        // Subtract the surplus equally from all non-minimum times
-        let equalizationValue = (surplus / nonMinimumWidths).toPrecision(2);
-        for (const tuple of percentTable) {
-            let uiPercent = tuple[0];
-            if (uiPercent <= this.minimumWidth) {
-                uiPercent = this.minimumWidth;
-            } else {
-                uiPercent -= equalizationValue;
-            }
-            tuple.push(uiPercent);
-        }
-
-        return percentTable;
+        return percentages;
     }
 }
