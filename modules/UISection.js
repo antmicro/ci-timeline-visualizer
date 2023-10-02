@@ -48,4 +48,13 @@ export class UISection {
         this.sectionDiv.style["background-color"] = this.color.toCSS();
         this.sectionDiv.style["border-color"] = this.borderColor.toCSS();
     }
+
+    setOnclick(onclick) {
+        this.sectionDiv.onclick = onclick;
+        if (onclick == null) {
+            this.sectionDiv.style["cursor"] = "auto";
+        } else {
+            this.sectionDiv.style["cursor"] = "pointer";
+        }
+    }
 }

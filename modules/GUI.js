@@ -12,6 +12,8 @@ export class GUI {
     pollMillis = 1000;
     isPolling = false;
 
+    htermScreen;
+
     constructor(parentElement, minimumWidth) {
         this.parentElement = parentElement;
         this.minimumWidth = minimumWidth;
@@ -55,6 +57,7 @@ export class GUI {
                 this.addNewUISection(
                     sections[i].sectionName,
                     sections[i].duration,
+                    sections[i].startLine,
                     percentages[i],
                     this.minimumWidth);
             }
@@ -71,7 +74,7 @@ export class GUI {
         this.initialize(sections);
     }
 
-    addNewUISection(name, duration, truePercent, uiPercent) {
+    addNewUISection(name, duration, lineNumber, percent, minWidth) {
         let newUISection = new UISection();
         if (this.uiSections[0] == null) {
             newUISection.setLeftmost();
@@ -82,11 +85,31 @@ export class GUI {
             newUISection.setRightmost();
         }
         let newColor = ColorGenerator.getSectionColor(name, this.existingColors);
-        newUISection.update(name, duration, truePercent, uiPercent);
+        newUISection.update(name, duration, percent, minWidth);
         newUISection.setColor(newColor);
+        if (lineNumber > 0)
+            newUISection.setOnclick(() => {this.scrollHterm(lineNumber)});
         this.existingColors.push(newColor);
         this.uiSections.push(newUISection);
         this.parentElement.appendChild(newUISection.sectionDiv);
+    }
+
+    scrollHterm(lineNumber) {
+        if (this.htermScreen == null) {
+            this.htermScreen = document.getElementById("hterm")
+                            .getElementsByTagName("iframe")[0]
+                            .contentWindow.document
+                            .getElementsByTagName("x-screen")[0];
+        }
+
+        // Grab the line-height style using the first x-row's style as an example
+        let rowStyle = getComputedStyle(this.htermScreen.getElementsByTagName("x-row")[0]);
+        let lineHeight = rowStyle.getPropertyValue("line-height");
+        lineHeight = parseInt(lineHeight);
+
+        // Scroll the top of the target line to the top
+        // This automatically clamps the value in case you try to scroll further down or up than you should
+        this.htermScreen.scrollTop = (lineNumber - 1) * lineHeight;
     }
 
     #minimumWidthCheck(sectionsAmount) {
