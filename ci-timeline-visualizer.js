@@ -3,21 +3,15 @@ import { Parser } from "./modules/Parser.js";
 import { GUI } from "./modules/GUI.js";
 import { State } from "./modules/global-state.js";
 
+// Find an existing or create a new ci-timeline-visualizer div
+const visualizerDivId = "ci-timeline-visualizer";
+let visualizerDiv = document.getElementById(visualizerDivId);
+if(visualizerDiv == null) {
+    let buildPage = document.getElementsByClassName("build-page")[0];
+    let buildTraceContainer = buildPage.getElementsByClassName("build-trace-container")[0];
 
-let parser = new Parser();
+    visualizerDiv = document.createElement("div");
+    visualizerDiv.id = visualizerDivId;
 
-let unfinishedJobLog = getLogFromFile("test/sample-logs/unfinished-log1.txt");
-//console.log(unfinishedJobLog);
-parser.parse(unfinishedJobLog);
-console.log(State.instance().sections);
-
-
-let gui = new GUI(document.getElementById("ci-timeline-visualizer"), 2);
-gui.startPolling();
-
-await new Promise(r => setTimeout(r, 3000));
-
-let jobLog = getLogFromFile("test/sample-logs/unfinished-log1-rest.txt");
-//console.log(jobLog);
-parser.parse(jobLog);
-console.log(State.instance().sections);
+    buildPage.insertBefore(visualizerDiv, buildTraceContainer);
+}
