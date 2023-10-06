@@ -1,17 +1,14 @@
-import { getLogFromFile, getLogFromAPI } from "./modules/fetch-log.js"
-import { Parser } from "./modules/Parser.js";
-import { GUI } from "./modules/GUI.js";
-import { State } from "./modules/global-state.js";
+import { Loader } from "./modules/Loader.js";
 
-// Find an existing or create a new ci-timeline-visualizer div
-const visualizerDivId = "ci-timeline-visualizer";
-let visualizerDiv = document.getElementById(visualizerDivId);
-if(visualizerDiv == null) {
-    let buildPage = document.getElementsByClassName("build-page")[0];
-    let buildTraceContainer = buildPage.getElementsByClassName("build-trace-container")[0];
+let loader = new Loader();
 
-    visualizerDiv = document.createElement("div");
-    visualizerDiv.id = visualizerDivId;
+let fetcher;
+let parser;
+let gui;
 
-    buildPage.insertBefore(visualizerDiv, buildTraceContainer);
-}
+[fetcher, parser, gui] = await loader.load();
+
+fetcher.setListener((data) => {parser.parse(data)});
+
+fetcher.startPolling();
+gui.startPolling();
