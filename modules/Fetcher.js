@@ -3,6 +3,10 @@ export class Fetcher {
 
     isPolling = false;
     pollMillis = 1000;
+    basePollMillis = 1000; //Will be moved to config
+    failedPolls = 0;
+    backoffStart = 5; //Will be moved to config
+    backoffMax = 5; //Will be moved to config
 
     listener = null;
 
@@ -59,6 +63,9 @@ export class Fetcher {
     }
 
     onReceived(request) {
+        this.pollMillis = this.basePollMillis;
+        this.failedPolls = 0;
+
         let contentRange = this.#parseContentRange(request.getResponseHeader("Content-Range"));
 
         // if there are no new bytes
@@ -98,8 +105,11 @@ export class Fetcher {
     }
 
     onFailed() {
-        console.log("[ci-timeline-visualizer] Encountered job fetching error. Stopping polling.");
-        this.stopPolling();
+        this.failedPolls += 1;
+        console.log(`[ci-timeline-visualizer] Encountered job fetching network error. ` +
+                    `This is the ${this.failedPolls}. failed poll since a success.`);
+        let exponentialBackoffMultiplier = 2 ** Math.min(Math.max(0, this.failedPolls - this.backoffStart), this.backoffMax)
+        this.pollMillis = this.basePollMillis * exponentialBackoffMultiplier;
     }
 
     setListener(listener) {
