@@ -2,21 +2,47 @@
 
 ci-timeline-visualizer is an extension for GitLab's job logs to visualize the elapsed time of execution for each of their stages.
 
-## Running
+## Usage
 
-### Setting up local web server
-`ci-timeline-visualizer.js` is a ES6 module, but the repository includes an `index.html` for local execution purposes.
+### Dependencies
 
-Modules only work via HTTP, so you should use a local web server, such as:
+Run `npm install`
+
+### Building
+
+Run `npm build`
+
+### Using as a library
+
+Your HTML should include:
+* A CSS stylesheet <br>
+  `<link rel="stylesheet" type="text/css" href="ci-timeline-visualizer.css">`
+* A JavaScript module <br>
+  `<script type="module" src="ci-timeline-visualizer.js"></script>`
+
+### Developing
+
+#### Local web server
+Modules only work via HTTP, so you should use a local web server.
+If you try to run it locally (`file://`), you will be met with a CORS policy error.
+
+`ci-timeline-visualizer.js` is an ES6 module, but the repository includes an `index.html` for local execution purposes.
+
+By default, you should run your server using vite. <br>
+This is done by running `npm run dev`.
+If you want to test the vite's bundled (already built!) output, run `npm run preview`.
+
+You can use alternatives to vite for the web server, such as:
 * Live Server, a VSCode extension
 * Node static server (not tested)
 * Node live server (not tested)
 
-The injection step assumes that the server is accessible at `http://localhost:5500/`. If you want or need to change it, you'd also need to change the URL in the injection script.
+The injection step assumes that the server is accessible at `http://localhost:5500/`.
+If you want or need to change it, you need to:
+* Pass additional arguments to the dev or preview server `npm run dev -- --port <new-port>`
+* Change the URLs in the injection script below
 
-If you try to run it locally (`file://`), you will be met with a CORS policy error.
-
-### Injecting
+#### Injection
 Make sure you are on the job log page!
 
 The URL should look similar to `example.com/<project-path>/-/jobs/<job-id>`
@@ -24,7 +50,7 @@ The URL should look similar to `example.com/<project-path>/-/jobs/<job-id>`
 If you modify the loaded HTML file, the module code won't execute. Because of this, you need to insert the element into the DOM by the DevTools js console. The module additionally uses some CSS of its own that needs to be injected. Just paste the following into the console:
 ```js
 let cssLink = document.createElement("link");
-cssLink.href = "http://localhost:5500/style.css";
+cssLink.href = "http://localhost:5500/ci-timeline-visualizer.css";
 cssLink.type = "text/css";
 cssLink.rel = "stylesheet";
 document.getElementsByTagName("head")[0].appendChild(cssLink);
