@@ -76,9 +76,6 @@ export class Fetcher {
         this.lastReceivedByte = contentRange[1];
 
         let response = request.response;
-        // For some reason XMLHttpRequest returns the response with an additional newline appended when
-        // the responseType is 'text'. Since the literal HTTP response is needed, it will be stripped.
-        response = response.substring(0, response.length - 1);
         // We have to ignore the first byte of the response after the first poll, because it has already been fetched.
         if (this.ignoreResponseFirstByte) {
             response = response.substring(1);
