@@ -1,4 +1,4 @@
-import { Section } from "./classes.js"
+import { Section, SectionTag } from "./classes.js"
 import { ConfigManager } from "./ConfigManager.js";
 import { GitlabAPI } from "./GitlabAPI.js";
 
@@ -50,5 +50,23 @@ export class SectionManager {
             }
         }
         this.notify();
+    }
+
+    closeLastSection(timestamp, lastLine) {
+        let lastSection = this.sections[this.sections.length - 1];
+
+        if (lastSection == null)
+            return;
+
+        if(!lastSection.isOpen)
+            return;
+
+        let artificialSectionTag = new SectionTag(
+            SectionTag.STOP,
+            timestamp,
+            lastSection.sectionName,
+            lastLine);
+        
+        this.addSectionsFromTags([artificialSectionTag]);
     }
 }

@@ -32,10 +32,10 @@ export class Fetcher {
     }
 
     async poll() {
-        while (this.isPolling) {
+        do {
             this.fetch();
             await new Promise(r => setTimeout(r, this.pollMillis));
-        }
+        } while (this.isPolling);
     }
 
     fetch() {
