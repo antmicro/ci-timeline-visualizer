@@ -1,0 +1,8 @@
+section_start:1695299370:prepare_executor[0K
+section_end:1695299388:prepare_executor[0Ksection_start:1695299388:prepare_script[0Ksection_end:1695299389:prepare_script[0Ksection_start:1695299389:get_sources[0K
+section_end:1695299390:get_sources[0Ksection_start:1695299390:restore_cache[0Ksection_end:1695299390:restore_cache[0Ksection_start:1695299390:download_artifacts[0K
+section_end:1695299392:download_artifacts[0Ksection_start:1695299392:build_script[0K
+section_end:1695300444:build_script[0Ksection_start:1695300444:after_script[0K
+section_end:1695300445:after_script[0Ksection_start:1695300445:upload_artifacts_on_failure[0K
+section_end:1695300447:upload_artifacts_on_failure[0K[31;1mERROR: Job failed: exit status 1
+[0;m

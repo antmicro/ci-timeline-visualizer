@@ -1,0 +1,8 @@
+section_start:1699347040:prepare_executor[0K
+section_end:1699347060:prepare_executor[0Ksection_start:1699347060:prepare_script[0Ksection_end:1699347060:prepare_script[0Ksection_start:1699347060:get_sources[0K
+section_end:1699347086:get_sources[0Ksection_start:1699347086:restore_cache[0Ksection_end:1699347087:restore_cache[0Ksection_start:1699347087:download_artifacts[0K
+section_end:1699347087:download_artifacts[0Ksection_start:1699347087:build_script[0K
+section_end:1699347227:build_script[0Ksection_start:1699347227:after_script[0K
+section_end:1699347228:after_script[0Ksection_start:1699347228:archive_cache[0Ksection_end:1699347228:archive_cache[0Ksection_start:1699347228:upload_artifacts_on_success[0K
+section_end:1699347230:upload_artifacts_on_success[0K[32;1mJob succeeded
+[0;m

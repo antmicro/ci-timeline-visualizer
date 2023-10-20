@@ -7,8 +7,31 @@
     <title>ci-timeline-visualizer</title>
 </head>
 <body>
-    <div id="ci-timeline-visualizer">
+    <div id="ci-timeline-visualizer" style="left:20%; width:60%">
     </div>
 </body>
-<script type="module" src="ci-timeline-visualizer.js"></script>
+<script type="module">
+    import { Fetcher } from "./modules/Fetcher.js";
+    import { Parser } from "./modules/Parser.js";
+    import { GUI } from "./modules/GUI.js";
+
+    let visualizerDiv = document.getElementById("ci-timeline-visualizer");
+
+    let fetcher = new Fetcher();
+    let parser = new Parser();
+    let gui = new GUI(visualizerDiv, 2);
+
+    let logLocation;
+    try {
+        logLocation = import.meta.env.VITE_TEST_LOG_LOCATION;
+    } catch {
+        logLocation = 'test/sample-logs/log1.txt';
+    }
+    fetcher.logURL = new URL(logLocation, window.location.href);
+
+    fetcher.setListener((data) => {parser.parse(data)});
+
+    fetcher.startPolling();
+    gui.startPolling();
+</script>
 </html>

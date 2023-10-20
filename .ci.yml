@@ -1,0 +1,17 @@
+image: node:18-buster
+
+stages:
+  - test
+
+screenshot-ci-vis:
+  before_script:
+    - apt-get -qqy update > /dev/null 2> /dev/null
+    - apt-get -qqy install --no-install-recommends chromium firefox-esr > /dev/null 2> /dev/null
+    - npm i
+  script:
+    - npx vitest screenshots.test.js
+  artifacts:
+    when: always
+    name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+    paths:
+      - "test/screenshots/"
