@@ -1,7 +1,6 @@
+import { ConfigManager } from "./ConfigManager.js"
 import { UISection } from "./UISection.js";
 import { ColorGenerator } from "./ColorGenerator.js";
-import { State } from "./global-state.js";
-import { ConfigManager } from "./ConfigManager.js";
 
 export class GUI {
     config;
@@ -9,16 +8,17 @@ export class GUI {
     parentElement;
     uiSections = [];
     #minWidth;
-    existingColors = [];
 
+    sectionManager;
+    pollMillis = 1000;
     isPolling = false;
 
     htermScreen;
 
-    constructor(parentElement) {
+    constructor(parentElement, sectionManager) {
         this.config = ConfigManager.config.GUI;
-        this.#minWidth = this.config.minWidth;
         this.parentElement = parentElement;
+        this.sectionManager = sectionManager;
         this.uiSections = [];
         this.existingColors = [];
         this.isPolling = false;
@@ -36,7 +36,7 @@ export class GUI {
     async poll() {
         if(!this.isPolling)
             return;
-        this.update(State.instance().sections);
+        this.update(this.sectionManager.sections);
 
         await new Promise(r => setTimeout(r, this.config.pollMillis));
 
@@ -49,24 +49,26 @@ export class GUI {
 
         let percentages = this.#calculatePercentages(sections);
 
+        let existingColors = [];
         for (const i in sections) {
-            if (this.uiSections[i] != null) {
-                this.uiSections[i].update(
-                    sections[i].sectionName,
-                    sections[i].duration,
-                    percentages[i],
-                    this.#minWidth);
-            } else {
-                this.addNewUISection(
-                    sections[i].sectionName,
-                    sections[i].duration,
-                    sections[i].startLine,
-                    percentages[i],
-                    this.#minWidth);
+            let newColor = ColorGenerator.getSectionColor(sections[i].sectionName, existingColors);
+            existingColors.push(newColor);
+
+            let updatedSection = this.uiSections[i];
+            if (updatedSection == null) {
+                updatedSection = this.#addNewUISection();
             }
+            updatedSection.update(
+                    sections[i].sectionName,
+                    newColor,
+                    sections[i].duration,
+                    percentages[i],
+                    this.#minWidth);
+            if(sections[i].startLine < 1)
+                updatedSection.setOnclick(null);
+            else
+                updatedSection.setOnclick(() => {this.scrollHterm(sections[i].startLine)});
         }
-
-
     }
 
     reset(sections) {
@@ -77,7 +79,7 @@ export class GUI {
         this.initialize(sections);
     }
 
-    addNewUISection(name, duration, lineNumber, percent, minWidth) {
+    #addNewUISection() {
         let newUISection = new UISection();
         if (this.uiSections[0] == null) {
             newUISection.setLeftmost();
@@ -87,14 +89,9 @@ export class GUI {
                 this.uiSections[lastSectionPosition].setMiddle();
             newUISection.setRightmost();
         }
-        let newColor = ColorGenerator.getSectionColor(name, this.existingColors);
-        newUISection.update(name, duration, percent, minWidth);
-        newUISection.setColor(newColor);
-        if (lineNumber > 0)
-            newUISection.setOnclick(() => {this.scrollHterm(lineNumber)});
-        this.existingColors.push(newColor);
         this.uiSections.push(newUISection);
         this.parentElement.appendChild(newUISection.sectionDiv);
+        return newUISection;
     }
 
     scrollHterm(lineNumber) {

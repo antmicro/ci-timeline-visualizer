@@ -1,6 +1,7 @@
 import { ConfigManager } from "./ConfigManager.js";
 import { Fetcher } from "./Fetcher.js";
 import { Parser } from "./Parser.js";
+import { SectionManager } from "./SectionManager.js";
 import { GUI } from "./GUI.js";
 
 export class Loader {
@@ -27,9 +28,10 @@ export class Loader {
 
         let fetcher = new Fetcher();
         let parser = new Parser();
-        let gui = new GUI(this.visualizerDiv);
+        let sectionManager = new SectionManager();
+        let gui = new GUI(this.visualizerDiv, sectionManager);
 
-        return [fetcher, parser, gui];
+        return [fetcher, parser, sectionManager, gui];
     }
 
     async #ensureAllElements() {

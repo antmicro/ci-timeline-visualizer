@@ -5,12 +5,16 @@ import { Loader } from "./modules/Loader.js";
 
   let fetcher;
   let parser;
+  let sectionManager;
   let gui;
 
-  [fetcher, parser, gui] = await loader.load();
+  [fetcher, parser, sectionManager, gui] = await loader.load();
 
   fetcher.setListener((data) => {parser.parse(data)});
+  parser.listener = (data) => {sectionManager.addSectionsFromTags(data)};
+  sectionManager.listeners.push((data) => {gui.update(data)});
 
   fetcher.startPolling();
+  sectionManager.createPendingSection();
   gui.startPolling();
 }());

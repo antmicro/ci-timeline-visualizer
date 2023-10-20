@@ -13,13 +13,15 @@
 <script type="module">
     import { Fetcher } from "./modules/Fetcher.js";
     import { Parser } from "./modules/Parser.js";
+    import { SectionManager } from "./modules/SectionManager.js";
     import { GUI } from "./modules/GUI.js";
 
     let visualizerDiv = document.getElementById("ci-timeline-visualizer");
 
     let fetcher = new Fetcher();
     let parser = new Parser();
-    let gui = new GUI(visualizerDiv, 2);
+    let sectionManager = new SectionManager();
+    let gui = new GUI(visualizerDiv, sectionManager);
 
     let logLocation;
     try {
@@ -27,9 +29,12 @@
     } catch {
         logLocation = 'test/sample-logs/log1.txt';
     }
+    if (logLocation == null)
+        logLocation = 'test/sample-logs/log1.txt';
     fetcher.logURL = new URL(logLocation, window.location.href);
 
     fetcher.setListener((data) => {parser.parse(data)});
+    parser.listener = (data) => {sectionManager.addSectionsFromTags(data)};
 
     fetcher.startPolling();
     gui.startPolling();

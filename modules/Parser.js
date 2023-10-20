@@ -1,13 +1,28 @@
-import { SectionTag, Section } from "./classes.js";
-import { State } from "./global-state.js";
+import { SectionTag } from "./classes.js";
 
 export class Parser {
     lastLineParsed = 0;
 
+    listener = null;
+    #bufferedSectionTags = [];
+
+    notify() {
+        if (this.listener == null)
+            return;
+        this.listener(this.getSectionTags());
+    }
+
+    getSectionTags() {
+        let returned = this.#bufferedSectionTags;
+        this.#bufferedSectionTags = [];
+        return returned;
+    }
+
     parse(rawJobLog) {
         let cleanJobLog = this.removeAnsi(rawJobLog);
-        let sectionTags = this.parseJobLog(cleanJobLog);
-        this.updateSections(sectionTags);
+        let newSectionTags = this.parseJobLog(cleanJobLog);
+        this.#bufferedSectionTags = this.#bufferedSectionTags.concat(newSectionTags);
+        this.notify();
     }
 
     removeAnsi(rawJobLog) {
@@ -56,29 +71,5 @@ export class Parser {
 
         this.lastLineParsed = lines.length;
         return sectionTags;
-    }
-
-    updateSections(newTags) {
-        let sections = State.instance().sections;
-        let lastSection = sections[sections.length - 1];
-
-        let isOpen = false;
-        if (lastSection != null)
-            isOpen = lastSection.isOpen;
-        // If there is a tag after the opening tag, it should be a closing tag.
-        // This might not be the case if subsections were to be implemented.
-        for (const tag of newTags) {
-            if (isOpen) {
-                lastSection.closeSection(tag);
-                isOpen = false;
-            } else {
-                let newSection = Section.openNewSection(tag);
-
-                sections.push(newSection);
-                lastSection = newSection;
-                isOpen = true;
-            }
-        }
-        //TODO: update visualization on any updates
     }
 }
