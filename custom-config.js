@@ -8,7 +8,12 @@ export const config = {
 
 /*
 Configuration values guide:
-
+URLs:
+    - gitlabRoot
+        string
+        Determines the root of the GitLab instance in the URL. By default it is '/'.
+        Your instance might be located somewhere else, for example if your instance is on http://example.com/git/, then
+        gitlabRoot value should be '/git/'.
 Loader:
     - visualizerDivId
         string

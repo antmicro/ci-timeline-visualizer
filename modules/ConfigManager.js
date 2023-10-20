@@ -1,6 +1,9 @@
 import {config as customConfig} from '../custom-config.js';
 
 const defaultConfig = {
+    "URLs": {
+        "gitlabRoot": "/"
+    },
     "Loader": {
         "visualizerDivId": "ci-timeline-visualizer"
     },

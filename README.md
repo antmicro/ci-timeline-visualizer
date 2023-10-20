@@ -8,6 +8,16 @@ ci-timeline-visualizer is an extension for GitLab's job logs to visualize the el
 
 Run `npm install`
 
+### Configuring
+
+If you need or want to configure the visualizer, you should do that in the
+`custom-config.js` file located in the root of the project. It's an ES6 module with a single exported JavaScript object - this way the config will be embedded in the built files, keeping their amount to a minimum.
+
+The file contains documentation explaining what each of the configurable values do. If you are unsure on how the config structure should look like, take a peek into the `modules/ConfigManager.js` file.
+
+Configurable values you might want to take a look at first:
+* `URLs.gitlabRoot` - if your GitLab instance isn't on the root path of the host,
+
 ### Building
 
 Run `npm run build`
