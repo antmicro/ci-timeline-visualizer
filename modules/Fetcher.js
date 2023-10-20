@@ -1,12 +1,12 @@
+import { ConfigManager } from "./ConfigManager.js";
+
 export class Fetcher {
     logURL;
+    config;
 
     isPolling = false;
     pollMillis = 1000;
-    basePollMillis = 1000; //Will be moved to config
     failedPolls = 0;
-    backoffStart = 5; //Will be moved to config
-    backoffMax = 5; //Will be moved to config
 
     listener = null;
 
@@ -17,6 +17,7 @@ export class Fetcher {
     ignoreResponseFirstByte = false;
 
     constructor() {
+        this.config = ConfigManager.config.Fetcher;
         this.logURL = new URL(window.location.href);
         this.logURL.pathname = this.logURL.pathname + "/raw";
     }
@@ -63,7 +64,7 @@ export class Fetcher {
     }
 
     onReceived(request) {
-        this.pollMillis = this.basePollMillis;
+        this.pollMillis = this.config.basePollMillis;
         this.failedPolls = 0;
 
         let contentRange = this.#parseContentRange(request.getResponseHeader("Content-Range"));
@@ -105,8 +106,8 @@ export class Fetcher {
         this.failedPolls += 1;
         console.log(`[ci-timeline-visualizer] Encountered job fetching network error. ` +
                     `This is the ${this.failedPolls}. failed poll since a success.`);
-        let exponentialBackoffMultiplier = 2 ** Math.min(Math.max(0, this.failedPolls - this.backoffStart), this.backoffMax)
-        this.pollMillis = this.basePollMillis * exponentialBackoffMultiplier;
+        let exponentialBackoffMultiplier = this.config.backoffBase ** Math.min(Math.max(0, this.failedPolls - this.config.backoffStart), this.config.backoffMax)
+        this.pollMillis = this.config.basePollMillis * exponentialBackoffMultiplier;
     }
 
     setListener(listener) {

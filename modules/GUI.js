@@ -1,22 +1,24 @@
 import { UISection } from "./UISection.js";
 import { ColorGenerator } from "./ColorGenerator.js";
 import { State } from "./global-state.js";
+import { ConfigManager } from "./ConfigManager.js";
 
 export class GUI {
-    minimumWidth = 2;
+    config;
 
     parentElement;
     uiSections = [];
+    #minWidth;
     existingColors = [];
 
-    pollMillis = 1000;
     isPolling = false;
 
     htermScreen;
 
-    constructor(parentElement, minimumWidth) {
+    constructor(parentElement) {
+        this.config = ConfigManager.config.GUI;
+        this.#minWidth = this.config.minWidth;
         this.parentElement = parentElement;
-        this.minimumWidth = minimumWidth;
         this.uiSections = [];
         this.existingColors = [];
         this.isPolling = false;
@@ -36,12 +38,13 @@ export class GUI {
             return;
         this.update(State.instance().sections);
 
-        await new Promise(r => setTimeout(r, this.pollMillis));
+        await new Promise(r => setTimeout(r, this.config.pollMillis));
 
         this.poll();
     }
 
     update(sections) {
+        this.#minWidth = this.config.minWidth;
         this.#minimumWidthCheck(sections.length);
 
         let percentages = this.#calculatePercentages(sections);
@@ -52,14 +55,14 @@ export class GUI {
                     sections[i].sectionName,
                     sections[i].duration,
                     percentages[i],
-                    this.minimumWidth);
+                    this.#minWidth);
             } else {
                 this.addNewUISection(
                     sections[i].sectionName,
                     sections[i].duration,
                     sections[i].startLine,
                     percentages[i],
-                    this.minimumWidth);
+                    this.#minWidth);
             }
         }
 
@@ -113,9 +116,9 @@ export class GUI {
     }
 
     #minimumWidthCheck(sectionsAmount) {
-        if (this.minimumWidth > (100 / sectionsAmount)) {
+        if (this.#minWidth > (100 / sectionsAmount)) {
             console.log("[ci-timeline-visualizer] Minimum width is too large for this many sections; changing it to 0");
-            this.minimumWidth = 0;
+            this.#minWidth = 0;
         }
     }
 
@@ -136,7 +139,7 @@ export class GUI {
                 percent = (section.duration / overallDuration).toPrecision(2) * 100;
             }
 
-            if(percent > this.minimumWidth) {
+            if(percent > this.#minWidth) {
                 nonMinimumWidths += 1;
             }
 

@@ -1,14 +1,12 @@
+import { ConfigManager } from "./ConfigManager.js";
 import { Fetcher } from "./Fetcher.js";
 import { Parser } from "./Parser.js";
 import { GUI } from "./GUI.js";
 
-const visualizerDivId = "ci-timeline-visualizer"; //Will be moved to ConfigManager
-
 export class Loader {
+    config = ConfigManager.config.Loader;
 
     visualizerDiv;
-
-    minimumWidth = 2; //Will be moved to ConfigManager
 
     requiredElements = {
         "buildPage": ".build-page",
@@ -20,16 +18,16 @@ export class Loader {
     async load() {
         await this.#ensureAllElements();
 
-        this.visualizerDiv = document.getElementById(visualizerDivId);
+        this.visualizerDiv = document.getElementById(this.config.visualizerDivId);
         if (this.visualizerDiv == null) {
             this.visualizerDiv = document.createElement("div");
-            this.visualizerDiv.id = visualizerDivId;
+            this.visualizerDiv.id = this.config.visualizerDivId;
             this.foundElements["buildPage"].insertBefore(this.visualizerDiv, this.foundElements["buildTraceContainer"]);
         }
 
         let fetcher = new Fetcher();
         let parser = new Parser();
-        let gui = new GUI(this.visualizerDiv, this.minimumWidth);
+        let gui = new GUI(this.visualizerDiv);
 
         return [fetcher, parser, gui];
     }

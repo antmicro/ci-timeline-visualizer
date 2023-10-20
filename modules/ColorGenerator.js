@@ -1,3 +1,4 @@
+import { ConfigManager } from "./ConfigManager.js"
 
 // This is a section_name: HSL() map.
 
@@ -22,24 +23,14 @@ export class HSL {
     }
 }
 
-const knownColors = new Map();
-knownColors.set("prepare_executor", new HSL(276, 10, 20));
-knownColors.set("build_script", new HSL(191, 46, 82));
-knownColors.set("download_artifacts", new HSL(4, 76, 56));
-
 export class ColorGenerator {
 
-    static colorParameters = {
-        minSaturation: 60,
-        maxSaturation: 100,
-        minLightness: 40,
-        maxLightness: 80,
-        minDistance: 0.2,
-        maxNonCollidingAttempts: 1000
-    }
+    static #colorParameters;
+    static #presetColors;
 
     static getSectionColor(sectionName, colorList) {
-        let newColor = knownColors.get(sectionName);
+        ColorGenerator.#updateConfig();
+        let newColor = ColorGenerator.#presetColors[sectionName];
 
         if (newColor == null) {
             newColor = ColorGenerator.getSeededDistantRandomColor(sectionName, colorList);
@@ -61,25 +52,25 @@ export class ColorGenerator {
             let newHue = ColorGenerator.mulberry32(seed) * 360;
             let newSaturation = ColorGenerator.lerp(
                 ColorGenerator.mulberry32(seed + 1),
-                ColorGenerator.colorParameters.minSaturation,
-                ColorGenerator.colorParameters.maxSaturation);
+                ColorGenerator.#colorParameters.minSaturation,
+                ColorGenerator.#colorParameters.maxSaturation);
             let newLightness = ColorGenerator.lerp(
                 ColorGenerator.mulberry32(seed + 2),
-                ColorGenerator.colorParameters.minLightness,
-                ColorGenerator.colorParameters.maxLightness);
+                ColorGenerator.#colorParameters.minLightness,
+                ColorGenerator.#colorParameters.maxLightness);
 
 
             newHSL = new HSL(newHue, newSaturation, newLightness);
             seed += 1;
             attempts += 1;
-        } while (this.colorCollisionCheck(newHSL, colorList) && attempts < this.colorParameters.maxNonCollidingAttempts)
+        } while (this.colorCollisionCheck(newHSL, colorList) && attempts < this.#colorParameters.maxNonCollidingAttempts)
 
         return newHSL;
     }
 
     static colorCollisionCheck(color, colorList) {
         for (const existingColor of colorList) {
-            if (this.getColorDistance(color, existingColor) < ColorGenerator.colorParameters.minDistance)
+            if (this.getColorDistance(color, existingColor) < ColorGenerator.#colorParameters.minDistance)
                 return true;
         }
         return false;
@@ -100,9 +91,14 @@ export class ColorGenerator {
         let weights = [1, 0.3, 0.3];
 
         let resultDistance = 0;
+        let maxDistance = 0;
         for (const i in componentDistances) {
             resultDistance += componentDistances[i] * weights[i];
+            maxDistance += weights[i];
         }
+
+        resultDistance = ColorGenerator.normalizeValue(resultDistance, 0, maxDistance);
+
         return resultDistance;
     }
 
@@ -121,5 +117,16 @@ export class ColorGenerator {
         t = Math.imul(t ^ t >>> 15, t | 1);
         t ^= t + Math.imul(t ^ t >>> 7, t | 61);
         return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    }
+
+    static #updateConfig() {
+        ColorGenerator.#colorParameters = ConfigManager.config.colorGenerator.colorParameters;
+        let presetColorsTuples = ConfigManager.config.colorGenerator.presetColors;
+        let presetColorsHSLs = {}
+        for (const key in presetColorsTuples) {
+            let tuple = presetColorsTuples[key];
+            presetColorsHSLs[key] = new HSL(tuple[0], tuple[1], tuple[2]);
+        }
+        ColorGenerator.#presetColors = presetColorsHSLs
     }
 }
