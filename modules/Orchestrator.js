@@ -36,7 +36,7 @@ export class Orchestrator {
         [this.fetcher, this.parser, this.sectionManager, this.gui] = await loader.load();
         await TimeManager.setup(this.sectionManager);
 
-        this.api = new GitlabAPI(window.location.href);
+        this.api = new GitlabAPI(ConfigManager.config.URLs["currentJobURL"]);
 
         this.initialJobData = await new Promise(resolve => {
             this.api.getJobData((response) => resolve(response));

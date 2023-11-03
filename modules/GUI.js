@@ -1,6 +1,7 @@
 import { ConfigManager } from "./ConfigManager.js"
 import { UISection } from "./UISection.js";
 import { ColorGenerator } from "./ColorGenerator.js";
+import { ScrollBehaviorFactory } from "./ScrollBehaviors/ScrollBehaviorFactory.js";
 
 export class GUI {
     config;
@@ -13,7 +14,7 @@ export class GUI {
     pollMillis = 1000;
     isPolling = false;
 
-    htermScreen;
+    scrollBehavior;
 
     constructor(parentElement, sectionManager) {
         this.config = ConfigManager.config.GUI;
@@ -22,6 +23,7 @@ export class GUI {
         this.uiSections = [];
         this.existingColors = [];
         this.isPolling = false;
+        this.scrollBehavior = ScrollBehaviorFactory.fromString(this.config['scrollBehavior']);
     }
 
     startPolling() {
@@ -64,10 +66,10 @@ export class GUI {
                     sections[i].duration,
                     percentages[i],
                     this.#minWidth);
-            if(sections[i].startLine < 1)
+            if(sections[i].startLine < 1 || this.scrollBehavior == null)
                 updatedSection.setOnclick(null);
             else
-                updatedSection.setOnclick(() => {this.scrollHterm(sections[i].startLine)});
+                updatedSection.setOnclick(() => {this.scrollBehavior.scrollTo(sections[i].startLine)});
         }
     }
 
@@ -92,24 +94,6 @@ export class GUI {
         this.uiSections.push(newUISection);
         this.parentElement.appendChild(newUISection.sectionDiv);
         return newUISection;
-    }
-
-    scrollHterm(lineNumber) {
-        if (this.htermScreen == null) {
-            this.htermScreen = document.getElementById("hterm")
-                            .getElementsByTagName("iframe")[0]
-                            .contentWindow.document
-                            .getElementsByTagName("x-screen")[0];
-        }
-
-        // Grab the line-height style using the first x-row's style as an example
-        let rowStyle = getComputedStyle(this.htermScreen.getElementsByTagName("x-row")[0]);
-        let lineHeight = rowStyle.getPropertyValue("line-height");
-        lineHeight = parseInt(lineHeight);
-
-        // Scroll the top of the target line to the top
-        // This automatically clamps the value in case you try to scroll further down or up than you should
-        this.htermScreen.scrollTop = (lineNumber - 1) * lineHeight;
     }
 
     #minimumWidthCheck(sectionsAmount) {

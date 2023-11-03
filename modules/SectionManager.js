@@ -14,7 +14,8 @@ export class SectionManager {
     }
 
     createPendingSection() {
-        let api = new GitlabAPI(window.location.href);
+        let URLs = ConfigManager.config.URLs;
+        let api = new GitlabAPI(URLs["currentJobURL"]);
 
         api.getJobData((jobData) => {
             if (jobData["queued_duration"] == null)

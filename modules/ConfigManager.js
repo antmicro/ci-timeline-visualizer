@@ -2,8 +2,16 @@ import {config as customConfig} from '../custom-config.js';
 
 const defaultConfig = {
     "distrustRunnerTime": true,
+    "URLs": {
+        "rootResolveMode": "auto",
+        "rootGuesses": ["git", "gitlab-instance"],
+        "gitlabRoot": "/",
+        "currentJobURL": window.location.href
+    },
     "Loader": {
-        "visualizerDivId": "ci-timeline-visualizer"
+        "visualizerDivId": "ci-timeline-visualizer",
+        "requiredElements": "detect",
+        "defaultRequiredElements": "post-14.4"
     },
     "Fetcher": {
         "basePollMillis": 1000,
@@ -13,7 +21,8 @@ const defaultConfig = {
     },
     "GUI": {
         "minWidth": 2,
-        "pollMillis": 1000
+        "pollMillis": 1000,
+        "scrollBehavior": "auto"
     },
     "colorGenerator": {
         "colorParameters": {

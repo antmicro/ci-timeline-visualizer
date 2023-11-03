@@ -29,7 +29,7 @@ export class TimeManager {
         if(TimeManager.firstSection == null) {
             sectionManager.listeners.push(TimeManager.firstSectionCheck);
         }
-        let api = new GitlabAPI(window.location.href)
+        let api = new GitlabAPI(ConfigManager.config.URLs["currentJobURL"])
 
         TimeManager.jobData = await new Promise(resolve => {
             api.getJobData((response) => resolve(response));

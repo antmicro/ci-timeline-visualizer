@@ -3,6 +3,7 @@ import { ConfigManager } from "./ConfigManager.js";
 export class Fetcher {
     logURL;
     config;
+    URLConfig;
 
     isPolling = false;
     pollMillis = 1000;
@@ -18,7 +19,8 @@ export class Fetcher {
 
     constructor() {
         this.config = ConfigManager.config.Fetcher;
-        this.logURL = new URL(window.location.href);
+        this.URLConfig = ConfigManager.config.URLs;
+        this.logURL = new URL(this.URLConfig['currentJobURL']);
         this.logURL.pathname = this.logURL.pathname + "/raw";
     }
 

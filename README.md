@@ -15,6 +15,9 @@ If you need or want to configure the visualizer, you should do that in the
 
 The file contains documentation explaining what each of the configurable values do. If you are unsure on how the config structure should look like, take a peek into the `modules/ConfigManager.js` file.
 
+Configurable values you might want to take a look at first:
+* `URLs.rootResolveMode` - if your GitLab instance has namespaces with /git/ or /gitlab-instance/ in them,
+
 ### Building
 
 Run `npm run build`
