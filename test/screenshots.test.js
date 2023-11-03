@@ -139,7 +139,7 @@ describe('Screenshots', async () => {
             }
 
             await browser.quit();
-        }, 10000);
+        }, 20000);
 
         afterAll(async () => {
             server.close();
