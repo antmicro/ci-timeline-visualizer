@@ -8,11 +8,12 @@ export default defineConfig({
         port: 5500
     },
     build: {
+        target: 'esnext',
         outDir: './build',
         lib: {
             entry: [
                 './ci-timeline-visualizer.js',
-                './style.css'
+                './ci-timeline-visualizer.css'
             ],
             formats: ['es'],
             name: 'ci-timeline-visualizer',

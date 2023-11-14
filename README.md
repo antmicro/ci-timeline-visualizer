@@ -10,7 +10,7 @@ Run `npm install`
 
 ### Building
 
-Run `npm build`
+Run `npm run build`
 
 ### Using as a library
 
