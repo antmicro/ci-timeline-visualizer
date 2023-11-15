@@ -5,6 +5,7 @@ stages:
 
 bundle:
   before_script:
+    - sed -i 's/#/__priv_/g' modules/*
     - npm i
   script:
     - npm run build
@@ -17,6 +18,7 @@ screenshot-ci-vis:
   before_script:
     - apt-get -qqy update > /dev/null 2> /dev/null
     - apt-get -qqy install --no-install-recommends chromium firefox-esr > /dev/null 2> /dev/null
+    - sed -i 's/#/__priv_/g' modules/*
     - npm i
   script:
     - npx vitest screenshots.test.js
