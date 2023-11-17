@@ -1,3 +1,5 @@
+import { TimeManager } from "./TimeManager.js";
+
 export class SectionTag {
     static START = 0;
     static STOP = 1;
@@ -73,8 +75,9 @@ export class Section {
     }
 
     get duration() {
-        if (this.isOpen)
-            return Math.floor(Date.now() / 1000) - this.startTimestamp;
+        if (this.isOpen) {
+            return TimeManager.currentEpoch - this.startTimestamp;
+        }
         return this.#duration;
     }
 }

@@ -1,4 +1,5 @@
 import { Loader } from "./modules/Loader.js";
+import { TimeManager } from "./modules/TimeManager.js";
 
 (async function () {
   let loader = new Loader();
@@ -9,6 +10,7 @@ import { Loader } from "./modules/Loader.js";
   let gui;
 
   [fetcher, parser, sectionManager, gui] = await loader.load();
+  await TimeManager.setup(sectionManager);
 
   fetcher.setListener((data) => {parser.parse(data)});
   parser.listener = (data) => {sectionManager.addSectionsFromTags(data)};

@@ -1,6 +1,7 @@
 import {config as customConfig} from '../custom-config.js';
 
 const defaultConfig = {
+    "distrustRunnerTime": true,
     "Loader": {
         "visualizerDivId": "ci-timeline-visualizer"
     },

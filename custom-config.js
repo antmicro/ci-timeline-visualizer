@@ -8,6 +8,14 @@ export const config = {
 
 /*
 Configuration values guide:
+distrustRunnerTime:
+    bool
+    TL;DR - turn it on if your runners aren't synchronized to real time.
+    Determines how the client get its time for the currently executing section.
+    If the runner provides an inaccurate time and GitLab provides an accurate time,
+    it is possible to calculate what is the time offset of the runner.
+    Next, we can get the time by calculating the difference
+    between the first section's start time and GitLab's job API output.
 Loader:
     - visualizerDivId
         string
