@@ -35,6 +35,9 @@ export class Parser {
     parseJobLog(cleanJobLog) {
         // Pick out section tags
         let lines = cleanJobLog.split('\n');
+        // Remove the last empty split, which is the end of the previous line.
+        if(lines[lines.length-1] === '')
+            lines.pop();
         let sectionRegex = /^section_(start|end):\d+:/i;
         let stringSections = [];
         for (const i in lines) {
@@ -69,7 +72,7 @@ export class Parser {
             sectionTags.push(new SectionTag(newTagType, newUnixTimestamp, newSectionName, section[1] + this.lastLineParsed));
         }
 
-        this.lastLineParsed = lines.length;
+        this.lastLineParsed += lines.length;
         return sectionTags;
     }
 }
