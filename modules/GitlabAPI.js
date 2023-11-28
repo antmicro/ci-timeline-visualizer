@@ -3,8 +3,13 @@ export class GitlabAPI {
     projectPath;
     jobId;
 
-    constructor(gitlabRoot, jobPageURL) {
-        this.gitlabURL = new URL(gitlabRoot, jobPageURL);
+    static commonInstanceRoots = [
+        'git',
+        'gitlab-instance'
+    ]
+
+    constructor(jobPageURL) {
+        this.gitlabURL = new URL('/', jobPageURL);
         this.relocateJob(jobPageURL);
     }
 
@@ -24,14 +29,25 @@ export class GitlabAPI {
     }
 
     #parseJobURL(jobPageURL) {
-        let startIndex = this.gitlabURL.toString().length;
-        let gitlabResource = jobPageURL.substring(startIndex);
+        let pathname = new URL(jobPageURL).pathname;
 
         // /?(project-path-capture-group)/-/jobs/(job-id-capture-group)/?.*
         let extractorRegex = /\/?(.*)\/-\/jobs\/(\d*)\/?.*/;
-        let regexResult = extractorRegex.exec(gitlabResource);
+        let regexResult = extractorRegex.exec(pathname);
 
-        let projectPath = encodeURIComponent(regexResult[1])
+        let splitURLPath = regexResult[1].split('/');
+        let projectPath = [];
+        while(splitURLPath.length > 0) {
+            let considered = splitURLPath.pop();
+            if(GitlabAPI.commonInstanceRoots.includes(considered)) {
+                splitURLPath.push(considered);
+                this.gitlabURL = new URL(splitURLPath.join('/'), this.gitlabURL)
+                break;
+            }
+            projectPath.unshift(considered);
+        }
+
+        projectPath = encodeURIComponent(projectPath.join('/'));
         let jobId = regexResult[2];
 
         return [projectPath, jobId];
