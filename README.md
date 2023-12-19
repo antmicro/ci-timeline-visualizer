@@ -1,5 +1,7 @@
 # ci-timeline-visualizer
 
+![ci-timeline-visualizer demo image](ci-vis-example.png)
+
 ci-timeline-visualizer is an extension for GitLab's job logs to visualize the elapsed time of execution for each of their stages.
 
 ## Usage
@@ -16,7 +18,7 @@ If you need or want to configure the visualizer, you should do that in the
 The file contains documentation explaining what each of the configurable values do. If you are unsure on how the config structure should look like, take a peek into the `modules/ConfigManager.js` file.
 
 Configurable values you might want to take a look at first:
-* `URLs.rootResolveMode` - if your GitLab instance has namespaces with /git/ or /gitlab-instance/ in them,
+* `URLs.rootResolveMode` - if your GitLab instance has namespaces with /git/ or /gitlab-instance/ in them
 
 ### Building
 
