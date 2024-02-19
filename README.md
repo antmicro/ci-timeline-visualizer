@@ -1,5 +1,7 @@
 # ci-timeline-visualizer
 
+Copyright (c) 2023-2024 [Antmicro](https://www.antmicro.com)
+
 ![ci-timeline-visualizer demo image](ci-vis-example.png)
 
 This repository contains the code of an extension for the [GitLab](https://gitlab.com/gitlab-org/gitlab) job log page.
